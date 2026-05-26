@@ -1,0 +1,158 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}{{ action }} Doctor Profile - HopeLife Clinic{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-premium p-4 p-md-5">
+                <!-- Form Header -->
+                <div class="d-flex align-items-center gap-3 border-bottom pb-3 mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-3 p-3" style="width: 55px; height: 55px;">
+                        <i class="fa-solid fa-user-doctor fs-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">{{ action }} Doctor Profile</h3>
+                        <p class="text-muted mb-0">Register a new medical specialist or update their staff credentials</p>
+                    </div>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <div class="d-flex">
+                                    <i class="fa-solid fa-circle-exmark me-2 mt-1"></i>
+                                    <div>{{ error }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Section 1: Account Login Credentials -->
+                    <h5 class="border-bottom pb-2 mb-3 text-primary"><i class="fa-solid fa-key me-2"></i>Account Details</h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.username.id_for_label }}" class="form-label fw-medium">Staff Username</label>
+                            {% if action == 'Edit' %}
+                                <input type="text" class="form-control bg-light" value="{{ form.instance.username }}" readonly disabled>
+                                <div class="form-text">Usernames cannot be changed once created.</div>
+                                <!-- Hidden input to bypass django form validation if required -->
+                                <div class="d-none">{{ form.username }}</div>
+                            {% else %}
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.email.id_for_label }}" class="form-label fw-medium">Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.password.id_for_label }}" class="form-label fw-medium">
+                                Password {% if action == 'Edit' %}(Optional){% endif %}
+                            </label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.password.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.confirm_password.id_for_label }}" class="form-label fw-medium">
+                                Confirm Password {% if action == 'Edit' %}(Optional){% endif %}
+                            </label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.confirm_password.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Medical Profile Demographics -->
+                    <h5 class="border-bottom pb-2 mb-3 text-primary"><i class="fa-solid fa-address-card me-2"></i>Medical Profile Details</h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label fw-medium">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.first_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label fw-medium">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.specialization.id_for_label }}" class="form-label fw-medium">Specialization Area</label>
+                            {{ form.specialization }}
+                            {% if form.specialization.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.specialization.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.experience.id_for_label }}" class="form-label fw-medium">Years of Experience</label>
+                            {{ form.experience }}
+                            {% if form.experience.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.experience.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label fw-medium">Direct Phone Number</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.phone.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="{{ form.profile_image.id_for_label }}" class="form-label fw-medium">Profile Image</label>
+                            
+                            {% if action == 'Edit' and doctor_profile.profile_image %}
+                                <div class="d-flex align-items-center gap-3 mb-3 bg-light p-3 rounded">
+                                    <img src="{{ doctor_profile.profile_image.url }}" alt="Current Photo" class="doctor-avatar-circle">
+                                    <div>
+                                        <small class="text-muted d-block">Currently uploaded image is active.</small>
+                                        <span class="small font-monospace">{{ doctor_profile.profile_image.name }}</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            {{ form.profile_image }}
+                            <div class="form-text text-muted">Leave blank if you wish to keep the existing image or use the default placeholder.</div>
+                            {% if form.profile_image.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.profile_image.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 justify-content-end border-top pt-4">
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-light px-4">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary-custom px-4">
+                            <i class="fa-solid fa-circle-check me-2"></i> Save Doctor Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

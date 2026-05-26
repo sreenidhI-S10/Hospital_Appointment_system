@@ -1,0 +1,53 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Patient Chart - HopeLife Clinic{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card card-premium p-4 p-md-5">
+                <div class="text-center mb-4 border-bottom pb-4">
+                    <!-- Avatar circle using patient's first initial -->
+                    <div class="patient-avatar-large mb-3">
+                        {{ patient.user.first_name|slice:":1" }}{{ patient.user.last_name|slice:":1" }}
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ patient.user.first_name }} {{ patient.user.last_name }}</h3>
+                    <p class="badge bg-light text-muted border px-3 py-2 rounded-pill fs-7 mb-0">Patient Record #{{ patient.id }}</p>
+                </div>
+                
+                <h5 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-file-invoice-dollar me-2"></i>Demographics</h5>
+                
+                <div class="row g-3 mb-4 bg-light p-3 rounded border">
+                    <div class="col-6">
+                        <small class="text-muted d-block">Age</small>
+                        <span class="fw-semibold text-secondary">{{ patient.age }} Years</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Gender</small>
+                        <span class="fw-semibold text-secondary">{{ patient.gender }}</span>
+                    </div>
+                    <div class="col-12 border-top pt-2">
+                        <small class="text-muted d-block">Primary Email</small>
+                        <span class="fw-semibold text-secondary">{{ patient.user.email }}</span>
+                    </div>
+                    <div class="col-12 border-top pt-2">
+                        <small class="text-muted d-block">Contact Phone</small>
+                        <span class="fw-semibold text-secondary">{{ patient.phone }}</span>
+                    </div>
+                    <div class="col-12 border-top pt-2">
+                        <small class="text-muted d-block">Home Address</small>
+                        <span class="fw-semibold text-secondary d-block mt-1" style="white-space: pre-line;">{{ patient.address }}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center border-top pt-4">
+                    <a href="{% url 'doctor_dashboard' %}" class="btn btn-primary-custom px-5">
+                        <i class="fa-solid fa-circle-chevron-left me-2"></i> Return to Worklist
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}{{ role_title }} Registration - HopeLife Clinic{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-premium p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle p-3 mb-3" style="width: 70px; height: 70px;">
+                        {% if role_title == 'Doctor' %}
+                            <i class="fa-solid fa-user-doctor fs-2"></i>
+                        {% else %}
+                            <i class="fa-solid fa-bed-pulse fs-2"></i>
+                        {% endif %}
+                    </div>
+                    <h3 class="fw-bold">{{ role_title }} Account Creation</h3>
+                    <p class="text-muted">Fill out the detailed form below to join HopeLife Clinic portal</p>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <div class="d-flex">
+                                    <i class="fa-solid fa-circle-xmark me-2 mt-1"></i>
+                                    <div>{{ error }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Section 1: Account Credentials -->
+                    <h5 class="border-bottom pb-2 mb-3 text-primary"><i class="fa-solid fa-key me-2"></i>Account Details</h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.username.id_for_label }}" class="form-label fw-medium">Choose Username</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.email.id_for_label }}" class="form-label fw-medium">Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.password.id_for_label }}" class="form-label fw-medium">Password</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.password.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.confirm_password.id_for_label }}" class="form-label fw-medium">Confirm Password</label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.confirm_password.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Section 2: Personal Profile Demographics -->
+                    <h5 class="border-bottom pb-2 mb-3 text-primary"><i class="fa-solid fa-address-card me-2"></i>Personal Profile</h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label fw-medium">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.first_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label fw-medium">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label fw-medium">Phone Number</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.phone.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if role_title == 'Patient' %}
+                            <!-- Patient Fields -->
+                            <div class="col-md-6">
+                                <label for="{{ form.age.id_for_label }}" class="form-label fw-medium">Age</label>
+                                {{ form.age }}
+                                {% if form.age.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.age.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.gender.id_for_label }}" class="form-label fw-medium">Gender</label>
+                                {{ form.gender }}
+                                {% if form.gender.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.gender.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label for="{{ form.address.id_for_label }}" class="form-label fw-medium">Home Address</label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.address.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <!-- Doctor Fields -->
+                            <div class="col-md-6">
+                                <label for="{{ form.specialization.id_for_label }}" class="form-label fw-medium">Specialization</label>
+                                {{ form.specialization }}
+                                {% if form.specialization.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.specialization.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.experience.id_for_label }}" class="form-label fw-medium">Experience (Years)</label>
+                                {{ form.experience }}
+                                {% if form.experience.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.experience.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label for="{{ form.profile_image.id_for_label }}" class="form-label fw-medium">Upload Profile Picture (Optional)</label>
+                                {{ form.profile_image }}
+                                <div class="form-text text-muted">Supports JPG, PNG or JPEG files.</div>
+                                {% if form.profile_image.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.profile_image.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-custom w-100 py-2 fs-6">
+                        <i class="fa-solid fa-user-plus me-2"></i> Register Account
+                    </button>
+                </form>
+                
+                <hr class="my-4 text-muted">
+                
+                <div class="text-center">
+                    <p class="text-muted mb-0">Already have an account? <a href="{% url 'login' %}" class="fw-semibold text-decoration-none">Log In here</a></p>
+                    {% if role_title == 'Patient' %}
+                        <p class="text-muted mt-2 mb-0">Applying to be a clinic doctor? <a href="{% url 'doctor_register' %}" class="text-info fw-semibold text-decoration-none">Doctor Sign Up</a></p>
+                    {% else %}
+                        <p class="text-muted mt-2 mb-0">Registering as a patient? <a href="{% url 'patient_register' %}" class="text-primary fw-semibold text-decoration-none">Patient Sign Up</a></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

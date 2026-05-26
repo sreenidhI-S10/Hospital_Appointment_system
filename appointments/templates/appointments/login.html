@@ -1,0 +1,78 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Hospital Portal Login - HopeLife Clinic{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card card-premium p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle p-3 mb-3" style="width: 70px; height: 70px;">
+                        <i class="fa-solid fa-lock fs-2"></i>
+                    </div>
+                    <h3 class="fw-bold">Clinic Portal Login</h3>
+                    <p class="text-muted">Enter your account credentials to access your portal</p>
+                </div>
+                
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <div class="d-flex">
+                                    <i class="fa-solid fa-circle-exmark me-2 mt-1"></i>
+                                    <div>{{ error }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Username Field -->
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label fw-medium">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0"><i class="fa-solid fa-user"></i></span>
+                            {{ form.username }}
+                        </div>
+                        {% if form.username.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.username.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="{{ form.password.id_for_label }}" class="form-label fw-medium mb-0">Password</label>
+                            <a href="{% url 'password_reset' %}" class="small fw-semibold text-decoration-none text-primary">Forgot Password?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0"><i class="fa-solid fa-key"></i></span>
+                            {{ form.password }}
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.password.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-custom w-100 py-2 fs-6">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i> Log In
+                    </button>
+                </form>
+                
+                <hr class="my-4 text-muted">
+                
+                <div class="text-center">
+                    <p class="text-muted mb-2">New patient? <a href="{% url 'patient_register' %}" class="fw-semibold text-decoration-none">Create an Account</a></p>
+                    <p class="text-muted mb-0">Medical staff registration: <a href="{% url 'doctor_register' %}" class="text-info fw-semibold text-decoration-none">Doctor Sign Up</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

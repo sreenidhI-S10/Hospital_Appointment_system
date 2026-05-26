@@ -1,0 +1,140 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}My Appointment History - HopeLife Clinic{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Page Header -->
+    <div class="border-bottom pb-3 mb-4">
+        <h2 class="fw-bold mb-0">My Appointment Booking History</h2>
+        <p class="text-muted mb-0">Review your past clinical visits, monitor pending slots, or cancel upcoming schedules</p>
+    </div>
+
+    <!-- History Table Card -->
+    <div class="card card-premium p-4">
+        <h5 class="fw-bold mb-4 text-secondary"><i class="fa-solid fa-clock-rotate-left me-2"></i>My Bookings Log</h5>
+        
+        {% if appointments %}
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Assigned Doctor</th>
+                            <th>Specialization</th>
+                            <th>Target Appointment Slot</th>
+                            <th>Reason for Visit</th>
+                            <th>Booking Date</th>
+                            <th>Current Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-secondary">Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}</div>
+                                    <small class="text-muted">Contact: {{ appointment.doctor.phone }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-primary border px-3 py-2 rounded-pill">{{ appointment.doctor.specialization }}</span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ appointment.appointment_date }}</div>
+                                    <div class="text-muted small"><i class="fa-solid fa-clock me-1 text-muted"></i> {{ appointment.appointment_time }}</div>
+                                </td>
+                                <td>
+                                    <small class="text-muted d-block text-truncate" style="max-width: 200px;" title="{{ appointment.reason }}">
+                                        {{ appointment.reason }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ appointment.created_at|date:"M d, Y @ P" }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge-status badge-{{ appointment.status|lower }}">{{ appointment.status }}</span>
+                                </td>
+                                <td class="text-end">
+                                    {% if appointment.status == 'Pending' or appointment.status == 'Approved' %}
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-danger btn-sm px-3 js-cancel-appointment"
+                                            title="Cancel Appointment"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#cancelAppointmentModal"
+                                            data-cancel-url="{% url 'cancel_appointment' appointment.id %}"
+                                            data-doctor="Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}"
+                                            data-date="{{ appointment.appointment_date }}"
+                                            data-time="{{ appointment.appointment_time }}"
+                                        >
+                                            <i class="fa-solid fa-calendar-minus me-1"></i> Cancel Slot
+                                        </button>
+                                    {% else %}
+                                        <span class="text-muted small font-monospace">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fa-solid fa-notes-medical fs-1 text-muted opacity-40 mb-3"></i>
+                <h5>No Scheduled Visits Found</h5>
+                <p class="text-muted">You have not scheduled any clinical visits yet.</p>
+                <a href="{% url 'book_appointment' %}" class="btn btn-primary-custom btn-sm mt-2 px-4 shadow-sm">
+                    <i class="fa-solid fa-calendar-plus me-1"></i> Book Slot Now
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal fade" id="cancelAppointmentModal" tabindex="-1" aria-labelledby="cancelAppointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <h5 class="modal-title fw-bold text-secondary" id="cancelAppointmentModalLabel">
+                        <i class="fa-solid fa-calendar-xmark text-danger me-2"></i>Cancel appointment?
+                    </h5>
+                    <p class="text-muted small mb-0">Please confirm before removing this scheduled slot.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="border rounded-3 p-3 bg-light">
+                    <div class="fw-semibold text-secondary" id="cancelDoctorName">Selected doctor</div>
+                    <div class="text-muted small mt-1">
+                        <i class="fa-solid fa-calendar me-1 text-primary"></i>
+                        <span id="cancelAppointmentDate">Appointment date</span>
+                    </div>
+                    <div class="text-muted small mt-1">
+                        <i class="fa-solid fa-clock me-1 text-muted"></i>
+                        <span id="cancelAppointmentTime">Appointment time</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Keep Slot</button>
+                <a href="#" class="btn btn-danger px-4" id="confirmCancelAppointment">
+                    <i class="fa-solid fa-calendar-minus me-1"></i> Cancel Slot
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.js-cancel-appointment').forEach((button) => {
+        button.addEventListener('click', () => {
+            document.getElementById('confirmCancelAppointment').href = button.dataset.cancelUrl;
+            document.getElementById('cancelDoctorName').textContent = button.dataset.doctor;
+            document.getElementById('cancelAppointmentDate').textContent = button.dataset.date;
+            document.getElementById('cancelAppointmentTime').textContent = button.dataset.time;
+        });
+    });
+</script>
+{% endblock %}

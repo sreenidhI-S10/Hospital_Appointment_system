@@ -1,0 +1,383 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Admin Dashboard - HopeLife Clinic{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Header Summary Block -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center border-bottom pb-3 mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">Hospital Administration</h2>
+            <p class="text-muted mb-0">Clinic operations summary, database lists, and staff management panel</p>
+        </div>
+        <div>
+            <a href="{% url 'admin_add_doctor' %}" class="btn btn-primary-custom shadow-sm">
+                <i class="fa-solid fa-user-plus me-2"></i> Add New Doctor
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistical Cards Grid -->
+    <div class="row g-4 mb-5">
+        <!-- Doctors Stat -->
+        <div class="col-md-4">
+            <div class="card card-premium card-stat stat-doctor p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2 font-monospace tracking-wide">Total Doctors</h6>
+                        <h2 class="display-5 fw-bold mb-0">{{ total_doctors }}</h2>
+                    </div>
+                    <div class="stat-icon text-info bg-info bg-opacity-10 rounded p-3">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Patients Stat -->
+        <div class="col-md-4">
+            <div class="card card-premium card-stat stat-patient p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2 font-monospace tracking-wide">Total Patients</h6>
+                        <h2 class="display-5 fw-bold mb-0">{{ total_patients }}</h2>
+                    </div>
+                    <div class="stat-icon text-purple bg-purple bg-opacity-10 rounded p-3" style="color:#8b5cf6; background-color:rgba(139, 92, 246, 0.1);">
+                        <i class="fa-solid fa-hospital-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments Stat -->
+        <div class="col-md-4">
+            <div class="card card-premium card-stat stat-appointment p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2 font-monospace tracking-wide">Total Bookings</h6>
+                        <h2 class="display-5 fw-bold mb-0">{{ total_appointments }}</h2>
+                    </div>
+                    <div class="stat-icon text-success bg-success bg-opacity-10 rounded p-3">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs for Database Tables -->
+    <div class="card card-premium p-4">
+        <ul class="nav nav-tabs mb-4 border-bottom" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-semibold text-secondary py-3 px-4 border-0" id="doctors-tab" data-bs-toggle="tab" data-bs-target="#doctors" type="button" role="tab" aria-controls="doctors" aria-selected="true">
+                    <i class="fa-solid fa-user-doctor me-2"></i> Doctors ({{ total_doctors }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-semibold text-secondary py-3 px-4 border-0" id="patients-tab" data-bs-toggle="tab" data-bs-target="#patients" type="button" role="tab" aria-controls="patients" aria-selected="false">
+                    <i class="fa-solid fa-bed-pulse me-2"></i> Patients ({{ total_patients }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-semibold text-secondary py-3 px-4 border-0" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="false">
+                    <i class="fa-solid fa-clock me-2"></i> Appointments ({{ total_appointments }})
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content Panes -->
+        <div class="tab-content" id="adminTabsContent">
+            
+            <!-- DOCTORS TAB -->
+            <div class="tab-pane fade show active" id="doctors" role="tabpanel" aria-labelledby="doctors-tab">
+                {% if doctors %}
+                    <div class="table-responsive">
+                        <table class="table table-custom align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Doctor Name</th>
+                                    <th>Specialization</th>
+                                    <th>Experience</th>
+                                    <th>Phone Number</th>
+                                    <th>Username & Email</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doctor in doctors %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-3">
+                                                {% if doctor.profile_image %}
+                                                    <img src="{{ doctor.profile_image.url }}" alt="Dr. {{ doctor.user.first_name }}" class="doctor-avatar-circle">
+                                                {% else %}
+                                                    <div class="doctor-avatar-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold">
+                                                        {{ doctor.user.first_name|slice:":1" }}{{ doctor.user.last_name|slice:":1" }}
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <h6 class="fw-bold mb-0">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</h6>
+                                                    <small class="text-muted">ID: #{{ doctor.id }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-primary border px-3 py-2 rounded-pill">{{ doctor.specialization }}</span>
+                                        </td>
+                                        <td>{{ doctor.experience }} Years</td>
+                                        <td>{{ doctor.phone }}</td>
+                                        <td>
+                                            <div class="fw-semibold">{{ doctor.user.username }}</div>
+                                            <div class="text-muted small">{{ doctor.user.email }}</div>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="btn-group">
+                                                <a href="{% url 'admin_edit_doctor' doctor.id %}" class="btn btn-outline-primary btn-sm px-3" title="Edit Doctor Profile">
+                                                    <i class="fa-solid fa-pencil"></i> Edit
+                                                </a>
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-outline-danger btn-sm px-3 js-delete-doctor"
+                                                    title="Delete Doctor Profile"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteDoctorModal"
+                                                    data-delete-url="{% url 'admin_delete_doctor' doctor.id %}"
+                                                    data-doctor-name="Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}"
+                                                    data-specialization="{{ doctor.specialization }}"
+                                                    data-username="{{ doctor.user.username }}"
+                                                >
+                                                    <i class="fa-solid fa-trash-can"></i> Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-user-doctor fs-1 text-muted opacity-40 mb-3"></i>
+                        <h5>No Doctors Registered</h5>
+                        <p class="text-muted">Click 'Add New Doctor' to register a medical professional.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- PATIENTS TAB -->
+            <div class="tab-pane fade" id="patients" role="tabpanel" aria-labelledby="patients-tab">
+                {% if patients %}
+                    <div class="table-responsive">
+                        <table class="table table-custom align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Patient Name</th>
+                                    <th>Age & Gender</th>
+                                    <th>Phone Number</th>
+                                    <th>Home Address</th>
+                                    <th>Username & Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for patient in patients %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="doctor-avatar-circle bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center fw-bold">
+                                                    {{ patient.user.first_name|slice:":1" }}{{ patient.user.last_name|slice:":1" }}
+                                                </div>
+                                                <div>
+                                                    <h6 class="fw-bold mb-0">{{ patient.user.first_name }} {{ patient.user.last_name }}</h6>
+                                                    <small class="text-muted">ID: #{{ patient.id }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold">{{ patient.age }} Years</div>
+                                            <div class="text-muted small">{{ patient.gender }}</div>
+                                        </td>
+                                        <td>{{ patient.phone }}</td>
+                                        <td>
+                                            <small class="text-muted">{{ patient.address }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold">{{ patient.user.username }}</div>
+                                            <div class="text-muted small">{{ patient.user.email }}</div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-bed-pulse fs-1 text-muted opacity-40 mb-3"></i>
+                        <h5>No Patients Registered</h5>
+                        <p class="text-muted">Patients can create accounts via the public registration portal.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- APPOINTMENTS TAB -->
+            <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
+                {% if appointments %}
+                    <div class="table-responsive">
+                        <table class="table table-custom align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Patient Name</th>
+                                    <th>Assigned Doctor</th>
+                                    <th>Appointment Slot</th>
+                                    <th>Reason for Visit</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold">{{ appointment.patient.user.first_name }} {{ appointment.patient.user.last_name }}</div>
+                                            <small class="text-muted">Phone: {{ appointment.patient.phone }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-secondary">Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}</div>
+                                            <small class="badge bg-light text-muted border">{{ appointment.doctor.specialization }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ appointment.appointment_date }}</div>
+                                            <div class="text-muted small"><i class="fa-solid fa-clock me-1 text-muted"></i> {{ appointment.appointment_time }}</div>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted d-block text-truncate" style="max-width: 200px;">{{ appointment.reason }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge-status badge-{{ appointment.status|lower }}">{{ appointment.status }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-danger btn-sm px-3 js-delete-appointment"
+                                                title="Delete Appointment Record"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteAppointmentModal"
+                                                data-delete-url="{% url 'admin_delete_appointment' appointment.id %}"
+                                                data-patient-name="{{ appointment.patient.user.first_name }} {{ appointment.patient.user.last_name }}"
+                                                data-doctor-name="Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}"
+                                                data-date="{{ appointment.appointment_date }}"
+                                                data-time="{{ appointment.appointment_time }}"
+                                            >
+                                                <i class="fa-solid fa-trash-can"></i> Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-calendar-check fs-1 text-muted opacity-40 mb-3"></i>
+                        <h5>No Appointments Scheduled</h5>
+                        <p class="text-muted">Patients can book slots via their respective dashboard portals.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteDoctorModal" tabindex="-1" aria-labelledby="deleteDoctorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <h5 class="modal-title fw-bold text-secondary" id="deleteDoctorModalLabel">
+                        <i class="fa-solid fa-user-xmark text-danger me-2"></i>Delete doctor?
+                    </h5>
+                    <p class="text-muted small mb-0">This will permanently remove the user account and doctor profile.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="border rounded-3 p-3 bg-light">
+                    <div class="fw-semibold text-secondary" id="deleteDoctorName">Selected doctor</div>
+                    <div class="text-muted small mt-1">
+                        <i class="fa-solid fa-stethoscope me-1 text-primary"></i>
+                        <span id="deleteDoctorSpecialization">Specialization</span>
+                    </div>
+                    <div class="text-muted small mt-1">
+                        <i class="fa-solid fa-user me-1 text-muted"></i>
+                        <span id="deleteDoctorUsername">Username</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Keep Doctor</button>
+                <a href="#" class="btn btn-danger px-4" id="confirmDeleteDoctor">
+                    <i class="fa-solid fa-trash-can me-1"></i> Delete Doctor
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteAppointmentModal" tabindex="-1" aria-labelledby="deleteAppointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <h5 class="modal-title fw-bold text-secondary" id="deleteAppointmentModalLabel">
+                        <i class="fa-solid fa-calendar-xmark text-danger me-2"></i>Delete appointment?
+                    </h5>
+                    <p class="text-muted small mb-0">This appointment booking will be removed from the database.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="border rounded-3 p-3 bg-light">
+                    <div class="fw-semibold text-secondary" id="deleteAppointmentPatient">Selected patient</div>
+                    <div class="text-muted small mt-1" id="deleteAppointmentDoctor">Selected doctor</div>
+                    <div class="text-muted small mt-1">
+                        <i class="fa-solid fa-calendar me-1 text-primary"></i>
+                        <span id="deleteAppointmentDate">Appointment date</span>
+                    </div>
+                    <div class="text-muted small mt-1">
+                        <i class="fa-solid fa-clock me-1 text-muted"></i>
+                        <span id="deleteAppointmentTime">Appointment time</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Keep Booking</button>
+                <a href="#" class="btn btn-danger px-4" id="confirmDeleteAppointment">
+                    <i class="fa-solid fa-trash-can me-1"></i> Delete Booking
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.js-delete-doctor').forEach((button) => {
+        button.addEventListener('click', () => {
+            document.getElementById('confirmDeleteDoctor').href = button.dataset.deleteUrl;
+            document.getElementById('deleteDoctorName').textContent = button.dataset.doctorName;
+            document.getElementById('deleteDoctorSpecialization').textContent = button.dataset.specialization;
+            document.getElementById('deleteDoctorUsername').textContent = button.dataset.username;
+        });
+    });
+
+    document.querySelectorAll('.js-delete-appointment').forEach((button) => {
+        button.addEventListener('click', () => {
+            document.getElementById('confirmDeleteAppointment').href = button.dataset.deleteUrl;
+            document.getElementById('deleteAppointmentPatient').textContent = button.dataset.patientName;
+            document.getElementById('deleteAppointmentDoctor').textContent = button.dataset.doctorName;
+            document.getElementById('deleteAppointmentDate').textContent = button.dataset.date;
+            document.getElementById('deleteAppointmentTime').textContent = button.dataset.time;
+        });
+    });
+</script>
+{% endblock %}

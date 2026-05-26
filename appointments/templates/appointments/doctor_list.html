@@ -1,0 +1,68 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Medical Staff Directory - HopeLife Clinic{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Page Header -->
+    <div class="border-bottom pb-3 mb-4">
+        <h2 class="fw-bold mb-0">Our Medical Staff Directory</h2>
+        <p class="text-muted mb-0">Explore our professional specialists and book a consultation with them instantly</p>
+    </div>
+
+    <!-- Doctor Grid -->
+    {% if doctors %}
+        <div class="row g-4 justify-content-center">
+            {% for doctor in doctors %}
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="card card-premium text-center p-4 h-100 d-flex flex-column">
+                        <!-- Profile Image -->
+                        <div class="mb-3">
+                            {% if doctor.profile_image %}
+                                <img src="{{ doctor.profile_image.url }}" alt="Dr. {{ doctor.user.first_name }}" class="doctor-avatar-large">
+                            {% else %}
+                                <div class="doctor-avatar-large mx-auto bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fs-1 fw-bold">
+                                    {{ doctor.user.first_name|slice:":1" }}{{ doctor.user.last_name|slice:":1" }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Info details -->
+                        <h5 class="fw-bold mb-1">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</h5>
+                        
+                        <!-- Specialization Badge -->
+                        <div class="mb-3">
+                            <span class="badge bg-light text-primary border px-3 py-2 rounded-pill fs-7">{{ doctor.specialization }}</span>
+                        </div>
+                        
+                        <!-- Details Grid -->
+                        <div class="bg-light p-3 rounded mb-4 text-start border">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="text-muted"><i class="fa-solid fa-briefcase me-1"></i> Experience:</small>
+                                <span class="fw-semibold small text-secondary">{{ doctor.experience }} Years</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted"><i class="fa-solid fa-phone me-1"></i> Clinic Contact:</small>
+                                <span class="fw-semibold small text-secondary">{{ doctor.phone }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <div class="mt-auto">
+                            <a href="{% url 'book_appointment_with_doctor' doctor.id %}" class="btn btn-primary-custom w-100 shadow-sm">
+                                <i class="fa-solid fa-calendar-check me-2"></i> Book Online Consultation
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fa-solid fa-user-doctor fs-1 text-muted opacity-40 mb-3"></i>
+            <h5>No Specialists Available</h5>
+            <p class="text-muted">We currently do not have any registered medical specialists in our database.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Doctor Dashboard - HopeLife Clinic{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Dashboard Header -->
+    <div class="border-bottom pb-3 mb-4">
+        <h2 class="fw-bold mb-0">Doctor Schedule Portal</h2>
+        <p class="text-muted mb-0">Manage patient bookings, consult clinic charts, and update appointment states</p>
+    </div>
+
+    <!-- Statistical Cards Grid -->
+    <div class="row g-4 mb-5">
+        <!-- Assigned Stat -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card card-premium card-stat stat-doctor p-4 h-100">
+                <h6 class="text-muted text-uppercase mb-2 font-monospace tracking-wide">Total Assigned</h6>
+                <h2 class="display-6 fw-bold mb-0">{{ total_assigned }}</h2>
+            </div>
+        </div>
+        
+        <!-- Pending Stat -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card card-premium card-stat stat-appointment p-4 h-100" style="border-left-color: #b45309;">
+                <h6 class="text-muted text-uppercase mb-2 font-monospace tracking-wide text-warning">Pending</h6>
+                <h2 class="display-6 fw-bold mb-0" style="color: #b45309;">{{ pending }}</h2>
+            </div>
+        </div>
+
+        <!-- Approved Stat -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card card-premium card-stat stat-appointment p-4 h-100" style="border-left-color: #059669;">
+                <h6 class="text-muted text-uppercase mb-2 font-monospace tracking-wide text-success">Approved</h6>
+                <h2 class="display-6 fw-bold mb-0" style="color: #059669;">{{ approved }}</h2>
+            </div>
+        </div>
+
+        <!-- Completed Stat -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card card-premium card-stat stat-patient p-4 h-100" style="border-left-color: #2563eb;">
+                <h6 class="text-muted text-uppercase mb-2 font-monospace tracking-wide text-primary">Completed</h6>
+                <h2 class="display-6 fw-bold mb-0" style="color: #2563eb;">{{ completed }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointments Worklist Table -->
+    <div class="card card-premium p-4">
+        <h5 class="fw-bold mb-4 text-secondary"><i class="fa-solid fa-list-check me-2"></i>My Appointment Worklist</h5>
+        
+        {% if appointments %}
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Patient Info</th>
+                            <th>Demographics</th>
+                            <th>Requested Slot</th>
+                            <th>Reason for Consultation</th>
+                            <th>Current Status</th>
+                            <th class="text-end" style="min-width: 200px;">Actions / Status Control</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold fs-6">{{ appointment.patient.user.first_name }} {{ appointment.patient.user.last_name }}</div>
+                                    <small class="text-muted"><i class="fa-solid fa-phone me-1 text-muted"></i>{{ appointment.patient.phone }}</small>
+                                </td>
+                                <td>
+                                    <div class="small fw-semibold">{{ appointment.patient.age }} Years Old</div>
+                                    <div class="text-muted small">{{ appointment.patient.gender }}</div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ appointment.appointment_date }}</div>
+                                    <div class="text-muted small"><i class="fa-solid fa-clock me-1 text-muted"></i> {{ appointment.appointment_time }}</div>
+                                </td>
+                                <td>
+                                    <small class="text-muted d-block" style="max-width: 250px; white-space: normal; word-wrap: break-word;">
+                                        {{ appointment.reason }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge-status badge-{{ appointment.status|lower }}">{{ appointment.status }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end align-items-center gap-2">
+                                        <!-- View patient profile trigger -->
+                                        <a href="{% url 'doctor_view_patient' appointment.patient.id %}" class="btn btn-outline-secondary btn-sm" title="View Patient Profile Details">
+                                            <i class="fa-solid fa-file-medical me-1"></i> Patient Info
+                                        </a>
+                                        
+                                        <!-- Inline form to change appointment status -->
+                                        <form method="POST" action="{% url 'doctor_update_status' appointment.id %}" class="d-inline-block">
+                                            {% csrf_token %}
+                                            <div class="input-group input-group-sm">
+                                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                    <option value="Pending" {% if appointment.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                                    <option value="Approved" {% if appointment.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                                    <option value="Completed" {% if appointment.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                                    <option value="Cancelled" {% if appointment.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fa-solid fa-calendar-xmark fs-1 text-muted opacity-40 mb-3"></i>
+                <h5>No Assigned Appointments</h5>
+                <p class="text-muted">You currently do not have any patient bookings scheduled.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

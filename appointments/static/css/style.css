@@ -1,0 +1,276 @@
+/* Import Modern Typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary-color: #0f172a;
+    --background-color: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    
+    /* Status Colors */
+    --status-pending-bg: #fffbeb;
+    --status-pending-text: #b45309;
+    --status-approved-bg: #ecfdf5;
+    --status-approved-text: #047857;
+    --status-completed-bg: #eff6ff;
+    --status-completed-text: #1d4ed8;
+    --status-cancelled-bg: #fef2f2;
+    --status-cancelled-text: #b91c1c;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Typography Customizations */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+/* Beautiful Premium Card Design */
+.card-premium {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-premium:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+}
+
+.card-stat {
+    border-left: 5px solid var(--primary-color);
+}
+
+.card-stat.stat-doctor { border-left-color: #06b6d4; }
+.card-stat.stat-patient { border-left-color: #8b5cf6; }
+.card-stat.stat-appointment { border-left-color: #10b981; }
+
+.stat-icon {
+    font-size: 2.25rem;
+    opacity: 0.85;
+}
+
+/* Status Badges */
+.badge-status {
+    padding: 0.5em 0.85em;
+    font-weight: 500;
+    font-size: 0.85rem;
+    border-radius: 30px;
+    display: inline-block;
+}
+
+.badge-pending {
+    background-color: var(--status-pending-bg);
+    color: var(--status-pending-text);
+    border: 1px solid rgba(180, 83, 9, 0.15);
+}
+
+.badge-approved {
+    background-color: var(--status-approved-bg);
+    color: var(--status-approved-text);
+    border: 1px solid rgba(4, 120, 87, 0.15);
+}
+
+.badge-completed {
+    background-color: var(--status-completed-bg);
+    color: var(--status-completed-text);
+    border: 1px solid rgba(29, 78, 216, 0.15);
+}
+
+.badge-cancelled {
+    background-color: var(--status-cancelled-bg);
+    color: var(--status-cancelled-text);
+    border: 1px solid rgba(185, 28, 28, 0.15);
+}
+
+/* Forms Styling */
+.form-control, .form-select {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.95rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+.btn-primary-custom {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+    font-weight: 500;
+    padding: 0.65rem 1.25rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.btn-primary-custom:hover, .btn-primary-custom:focus {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.btn-primary-custom:active {
+    transform: translateY(1px);
+}
+
+/* Custom Navbar */
+.navbar-custom {
+    background-color: var(--secondary-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.navbar-custom .navbar-brand {
+    font-weight: 700;
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar-custom .nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.navbar-custom .nav-link:hover, .navbar-custom .nav-link.active {
+    color: #fff !important;
+}
+
+/* Header Banner Hero Styling */
+.hero-banner {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #fff;
+    padding: 6rem 0;
+    border-bottom: 4px solid var(--primary-color);
+}
+
+.hero-btn-container {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Footer Custom Styling */
+footer {
+    background-color: var(--secondary-color);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+}
+
+footer a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* Flash Messages Animation */
+.alert-dismissible {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    animation: slideDown 0.3s ease-out forwards;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Custom Tables */
+.table-custom {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.table-custom th {
+    background-color: #f1f5f9;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem;
+}
+
+.table-custom td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table-custom tr:last-child td {
+    border-bottom: none;
+}
+
+/* Doctor Profile Round Image */
+.doctor-avatar-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+}
+
+.doctor-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Patient profile circular icon */
+.patient-avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
