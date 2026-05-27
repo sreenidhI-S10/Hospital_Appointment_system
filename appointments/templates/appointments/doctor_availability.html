@@ -1,0 +1,154 @@
+{% extends 'appointments/base.html' %}
+{% load static %}
+
+{% block title %}Manage Availability - Doctor Portal{% endblock %}
+
+{% block content %}
+<!-- Doctor Portal Banner -->
+<div class="hero-gradient mb-5">
+    <div class="container py-4 text-center text-md-start">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <span class="badge bg-white bg-opacity-20 px-3 py-2 rounded-pill mb-3 text-uppercase fw-semibold tracking-wider text-white">Roster Control</span>
+                <h1 class="display-5 fw-bold text-white mb-2">Schedule & Availability</h1>
+                <p class="lead text-white-70 mb-0">Manage your consultation hours, patient visit modes, and weekly recurring slots.</p>
+            </div>
+            <div class="col-lg-4 text-end d-none d-lg-block">
+                <i class="fa-solid fa-clock-pulse fs-1 text-white opacity-25" style="font-size: 8rem;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row g-4">
+        <!-- Add New Slot Form -->
+        <div class="col-lg-5 col-md-12">
+            <div class="glass-card p-4 border-0 shadow-sm">
+                <h4 class="fw-bold mb-4 form-section-header">Add Availability Slot</h4>
+                
+                <form method="POST">
+                    {% csrf_type %}
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger p-2 small">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Day of the Week -->
+                    <div class="mb-3">
+                        <label class="form-label small text-muted text-uppercase fw-bold">{{ form.day_of_week.label }}</label>
+                        <select name="{{ form.day_of_week.name }}" class="form-select {% if form.day_of_week.errors %}is-invalid{% endif %}" required>
+                            <option value="">Choose Day...</option>
+                            <option value="0">Monday</option>
+                            <option value="1">Tuesday</option>
+                            <option value="2">Wednesday</option>
+                            <option value="3">Thursday</option>
+                            <option value="4">Friday</option>
+                            <option value="5">Saturday</option>
+                            <option value="6">Sunday</option>
+                        </select>
+                        {% if form.day_of_week.errors %}
+                            <div class="invalid-feedback">{{ form.day_of_week.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Time Slots -->
+                    <div class="row mb-3">
+                        <div class="col-md-6 col-sm-12">
+                            <label class="form-label small text-muted text-uppercase fw-bold">{{ form.start_time.label }}</label>
+                            <input type="time" name="{{ form.start_time.name }}" class="form-control {% if form.start_time.errors %}is-invalid{% endif %}" required>
+                            {% if form.start_time.errors %}
+                                <div class="invalid-feedback">{{ form.start_time.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <label class="form-label small text-muted text-uppercase fw-bold">{{ form.end_time.label }}</label>
+                            <input type="time" name="{{ form.end_time.name }}" class="form-control {% if form.end_time.errors %}is-invalid{% endif %}" required>
+                            {% if form.end_time.errors %}
+                                <div class="invalid-feedback">{{ form.end_time.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Consultation Mode -->
+                    <div class="mb-4">
+                        <label class="form-label small text-muted text-uppercase fw-bold">{{ form.consultation_mode.label }}</label>
+                        <select name="{{ form.consultation_mode.name }}" class="form-select {% if form.consultation_mode.errors %}is-invalid{% endif %}" required>
+                            <option value="in_person">In-person</option>
+                            <option value="video">Video consultation</option>
+                        </select>
+                        {% if form.consultation_mode.errors %}
+                            <div class="invalid-feedback">{{ form.consultation_mode.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100 py-3 d-flex align-items-center justify-content-center gap-2">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        <span>Register Availability Slot</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Roster / Roster List -->
+        <div class="col-lg-7 col-md-12">
+            <div class="glass-card p-4 border-0 shadow-sm">
+                <h4 class="fw-bold mb-4 form-section-header">Your Configured Slots</h4>
+
+                {% if availabilities %}
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Hours</th>
+                                    <th>Mode</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for slot in availabilities %}
+                                    <tr class="hover-lift">
+                                        <td class="fw-bold text-dark">
+                                            {% if slot.day_of_week == 0 %}Monday
+                                            {% elif slot.day_of_week == 1 %}Tuesday
+                                            {% elif slot.day_of_week == 2 %}Wednesday
+                                            {% elif slot.day_of_week == 3 %}Thursday
+                                            {% elif slot.day_of_week == 4 %}Friday
+                                            {% elif slot.day_of_week == 5 %}Saturday
+                                            {% elif slot.day_of_week == 6 %}Sunday
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</td>
+                                        <td>
+                                            {% if slot.consultation_mode == 'in_person' %}
+                                                <span class="badge bg-teal bg-opacity-10 text-teal px-2 py-1 rounded-pill"><i class="fa-solid fa-hospital-user me-1"></i> In-Person</span>
+                                            {% else %}
+                                                <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill"><i class="fa-solid fa-video me-1"></i> Video Call</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-available px-3 py-1.5 rounded-pill d-inline-flex align-items-center gap-1.5">
+                                                <span class="spinner-grow bg-teal spinner-grow-sm" role="status" style="width: 8px; height: 8px;"></span> Active
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-calendar-xmark fs-1 text-muted opacity-25 mb-3"></i>
+                        <h5 class="fw-bold">No Availability Configured</h5>
+                        <p class="text-muted small">You haven't registered any weekly recurring hours. Fill out form on the left to activate booking slots for patients.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

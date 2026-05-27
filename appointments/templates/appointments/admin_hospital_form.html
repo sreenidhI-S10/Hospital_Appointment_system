@@ -1,0 +1,169 @@
+{% extends 'appointments/base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Hospital - HopeLife Clinic{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-premium p-4 p-md-5">
+                <!-- Form Header -->
+                <div class="d-flex align-items-center gap-3 border-bottom pb-3 mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-3 p-3" style="width: 55px; height: 55px;">
+                        <i class="fa-solid fa-hospital fs-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0 text-secondary">{{ action }} Hospital</h3>
+                        <p class="text-muted mb-0">Register a new healthcare facility or update existing profile details</p>
+                    </div>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger shadow-sm border-0">
+                            {% for error in form.non_field_errors %}
+                                <div class="d-flex align-items-center">
+                                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                                    <div>{{ error }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Section 1: Basic Hospital Information -->
+                    <h5 class="border-bottom pb-2 mb-3 text-primary"><i class="fa-solid fa-info-circle me-2"></i>Basic Information</h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <label for="{{ form.hospital_name.id_for_label }}" class="form-label fw-medium">Hospital Name</label>
+                            {{ form.hospital_name }}
+                            {% if form.hospital_name.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.hospital_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="{{ form.hospital_description.id_for_label }}" class="form-label fw-medium">Description / Facilities</label>
+                            {{ form.hospital_description }}
+                            {% if form.hospital_description.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.hospital_description.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Address & Coordinates -->
+                    <h5 class="border-bottom pb-2 mb-3 text-primary"><i class="fa-solid fa-map-location-dot me-2"></i>Location & Contacts</h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <label for="{{ form.location.id_for_label }}" class="form-label fw-medium">Street Address</label>
+                            {{ form.location }}
+                            {% if form.location.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.location.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.city.id_for_label }}" class="form-label fw-medium">City</label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.city.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.state.id_for_label }}" class="form-label fw-medium">State</label>
+                            {{ form.state }}
+                            {% if form.state.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.state.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="{{ form.pincode.id_for_label }}" class="form-label fw-medium">Pincode</label>
+                            {{ form.pincode }}
+                            {% if form.pincode.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.pincode.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.contact_number.id_for_label }}" class="form-label fw-medium">Contact Number</label>
+                            {{ form.contact_number }}
+                            {% if form.contact_number.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.contact_number.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium d-block">Services Available</label>
+                            <div class="form-check form-switch mt-2">
+                                {{ form.emergency_available }}
+                                <label class="form-check-label fw-semibold text-secondary" for="{{ form.emergency_available.id_for_label }}">
+                                    Enable Emergency Fast-Booking / 24x7 Ambulance
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.latitude.id_for_label }}" class="form-label fw-medium">Latitude Coordinate</label>
+                            {{ form.latitude }}
+                            <div class="form-text">Must be a valid decimal between -90 and 90</div>
+                            {% if form.latitude.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.latitude.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.longitude.id_for_label }}" class="form-label fw-medium">Longitude Coordinate</label>
+                            {{ form.longitude }}
+                            <div class="form-text">Must be a valid decimal between -180 and 180</div>
+                            {% if form.longitude.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.longitude.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Hospital Media -->
+                    <h5 class="border-bottom pb-2 mb-3 text-primary"><i class="fa-solid fa-image me-2"></i>Hospital Representative Image</h5>
+                    
+                    <div class="row g-3 mb-5">
+                        <div class="col-md-12">
+                            <label for="{{ form.hospital_image.id_for_label }}" class="form-label fw-medium">Select Image</label>
+                            
+                            {% if action == 'Edit' and hospital.hospital_image %}
+                                <div class="d-flex align-items-center gap-3 mb-3 bg-light p-3 rounded border">
+                                    <img src="{{ hospital.hospital_image.url }}" alt="Current Photo" style="width: 100px; height: 75px; object-fit: cover; border-radius: 8px;">
+                                    <div>
+                                        <div class="small fw-bold text-secondary">Current Image:</div>
+                                        <div class="small text-muted">{{ hospital.hospital_image.name }}</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            {{ form.hospital_image }}
+                            <div class="form-text">Upload a JPG, PNG, or WebP image showing the exterior/interior of the facility.</div>
+                            {% if form.hospital_image.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.hospital_image.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-end gap-3 border-top pt-4">
+                        <a href="{% url 'admin_hospital_list' %}" class="btn btn-outline-secondary px-4 py-2">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary-custom px-5 py-2">
+                            <i class="fa-solid fa-save me-1"></i> Save Hospital
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

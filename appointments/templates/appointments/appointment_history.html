@@ -39,8 +39,8 @@
                                     <span class="badge bg-light text-primary border px-3 py-2 rounded-pill">{{ appointment.doctor.specialization }}</span>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ appointment.appointment_date }}</div>
-                                    <div class="text-muted small"><i class="fa-solid fa-clock me-1 text-muted"></i> {{ appointment.appointment_time }}</div>
+                                    <div class="fw-semibold"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ appointment.scheduled_datetime|date:"Y-m-d" }}</div>
+                                    <div class="text-muted small"><i class="fa-solid fa-clock me-1 text-muted"></i> {{ appointment.scheduled_datetime|time:"g:i A" }}</div>
                                 </td>
                                 <td>
                                     <small class="text-muted d-block text-truncate" style="max-width: 200px;" title="{{ appointment.reason }}">
@@ -63,8 +63,8 @@
                                             data-bs-target="#cancelAppointmentModal"
                                             data-cancel-url="{% url 'cancel_appointment' appointment.id %}"
                                             data-doctor="Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}"
-                                            data-date="{{ appointment.appointment_date }}"
-                                            data-time="{{ appointment.appointment_time }}"
+                                            data-date="{{ appointment.scheduled_datetime|date:'Y-m-d' }}"
+                                            data-time="{{ appointment.scheduled_datetime|time:'g:i A' }}"
                                         >
                                             <i class="fa-solid fa-calendar-minus me-1"></i> Cancel Slot
                                         </button>

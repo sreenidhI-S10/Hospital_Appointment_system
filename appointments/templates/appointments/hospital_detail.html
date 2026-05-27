@@ -1,0 +1,182 @@
+{% extends 'appointments/base.html' %}
+{% load static %}
+
+{% block title %}{{ hospital.hospital_name }} - HopeLife Platform{% endblock %}
+
+{% block content %}
+<!-- Animated Hero Header -->
+<div class="hero-gradient mb-5">
+    <div class="container py-3">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <a href="{% url 'hospital_list' %}" class="btn btn-outline-light btn-sm mb-3 px-3">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Hospitals
+                </a>
+                <h1 class="display-4 fw-bold text-white mb-2">{{ hospital.hospital_name }}</h1>
+                <p class="lead text-white-70 mb-0"><i class="fa-solid fa-location-dot me-1 text-info"></i> {{ hospital.location }}, {{ hospital.city }}, {{ hospital.state }} - {{ hospital.pincode }}</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                {% if hospital.emergency_available %}
+                    <span class="badge bg-danger fs-6 px-4 py-3 rounded-pill shadow-lg d-inline-flex align-items-center gap-2">
+                        <i class="fa-solid fa-truck-medical pulse-loader"></i> EMERGENCY DEPT ACTIVE
+                    </span>
+                {% else %}
+                    <span class="badge bg-secondary fs-6 px-4 py-3 rounded-pill bg-opacity-75">
+                        General Clinic Hours Only
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row g-4">
+        <!-- Hospital Main Roster / Info -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4 mb-4 border-0 shadow-sm">
+                <h3 class="fw-bold mb-3 form-section-header">About the Hospital</h3>
+                <p class="text-secondary leading-relaxed mb-4">
+                    {% if hospital.hospital_description %}
+                        {{ hospital.hospital_description }}
+                    {% else %}
+                        No description is available for this facility yet. Rest assured, it is staffed with certified healthcare specialists dedicated to your comfort and well-being.
+                    {% endif %}
+                </p>
+                
+                <div class="row g-3 border-top pt-4">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-teal bg-opacity-10 text-teal p-3 rounded-circle">
+                                <i class="fa-solid fa-phone fs-4"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block uppercase fw-bold tracking-wider">Contact Number</small>
+                                <span class="fw-semibold text-dark">{{ hospital.contact_number }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                                <i class="fa-solid fa-map-location-dot fs-4"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block uppercase fw-bold tracking-wider">Coordinates</small>
+                                <span class="fw-semibold text-dark">
+                                    {% if hospital.latitude and hospital.longitude %}
+                                        Lat: {{ hospital.latitude }}, Lon: {{ hospital.longitude }}
+                                    {% else %}
+                                        Not geocoded
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roster of Doctors -->
+            <div class="glass-card p-4 border-0 shadow-sm">
+                <h3 class="fw-bold mb-4 form-section-header">Medical Specialists On-Duty</h3>
+                <div class="row g-4">
+                    {% if doctors %}
+                        {% for doctor in doctors %}
+                            <div class="col-md-6 col-sm-12">
+                                <div class="card card-premium p-4 h-100 border-0 bg-white shadow-sm hover-lift">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        {% if doctor.profile_image %}
+                                            <img src="{{ doctor.profile_image.url }}" alt="{{ doctor.user.first_name }}" class="doctor-avatar-circle" style="width: 50px; height: 50px;">
+                                        {% else %}
+                                            <div class="doctor-avatar-circle bg-teal bg-opacity-10 text-teal d-flex align-items-center justify-content-center fw-bold fs-5" style="width: 50px; height: 50px;">
+                                                {{ doctor.user.first_name|slice:":1" }}{{ doctor.user.last_name|slice:":1" }}
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <h5 class="fw-bold mb-0 text-dark">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</h5>
+                                            <span class="badge bg-teal bg-opacity-10 text-teal border-0 rounded-pill px-2 py-1 mt-1 fs-8">{{ doctor.department.name }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3 text-secondary small">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Specialization:</span>
+                                            <strong class="text-dark">{{ doctor.specialization }}</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Experience:</span>
+                                            <strong class="text-dark">{{ doctor.experience }} Years</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Consultation Fee:</span>
+                                            <strong class="text-teal">${{ doctor.consultation_fees }}</strong>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if request.user.role == 'patient' %}
+                                        <a href="{% url 'book_appointment_with_doctor' doctor.id %}" class="btn btn-primary-custom btn-sm w-100 py-2 d-flex align-items-center justify-content-center gap-1">
+                                            <i class="fa-regular fa-calendar-check"></i> Book Appointment
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'login' %}?next={% url 'book_appointment_with_doctor' doctor.id %}" class="btn btn-outline-teal btn-sm w-100 py-2 text-decoration-none text-center">
+                                            Log in as Patient to Book
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12 text-center py-4">
+                            <i class="fa-solid fa-user-slash fs-1 text-muted opacity-25 mb-3"></i>
+                            <h5 class="fw-bold">No Doctors Registered</h5>
+                            <p class="text-muted small">We don't have any physicians registered under this facility yet. Administrative staff can add them in the admin dashboard.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Roster / Quick Stats -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4 border-0 shadow-sm mb-4">
+                <h4 class="fw-bold mb-3 text-dark">Quick Contact</h4>
+                <ul class="list-unstyled mb-0">
+                    <li class="d-flex gap-2 mb-3">
+                        <i class="fa-solid fa-headset text-teal mt-1"></i>
+                        <div>
+                            <small class="text-muted d-block">Support Desk</small>
+                            <span class="fw-semibold text-dark">{{ hospital.contact_number }}</span>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-2 mb-3">
+                        <i class="fa-solid fa-clock text-teal mt-1"></i>
+                        <div>
+                            <small class="text-muted d-block">Working Hours</small>
+                            <span class="fw-semibold text-dark">24/7 Support Active</span>
+                        </div>
+                    </li>
+                    <li class="d-flex gap-2">
+                        <i class="fa-solid fa-location-arrow text-teal mt-1"></i>
+                        <div>
+                            <small class="text-muted d-block">City Location</small>
+                            <span class="fw-semibold text-dark">{{ hospital.city }} Office</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            {% if hospital.emergency_available and request.user.role == 'patient' %}
+                <div class="card glass-card border-0 bg-danger bg-opacity-10 shadow-sm p-4 text-center">
+                    <i class="fa-solid fa-truck-medical text-danger fs-1 mb-3 pulse-loader"></i>
+                    <h4 class="fw-bold text-danger mb-2">Need Urgent Care?</h4>
+                    <p class="text-secondary small mb-4">This hospital accepts direct instant emergency appointments. We will book a room and reserve a specialist immediately.</p>
+                    <a href="{% url 'emergency_fast_booking' %}" class="btn btn-danger w-100 py-3 d-flex align-items-center justify-content-center gap-2">
+                        <i class="fa-solid fa-truck-flash"></i>
+                        <span>Fast-Book Emergency</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

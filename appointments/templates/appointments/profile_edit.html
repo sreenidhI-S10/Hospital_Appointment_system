@@ -103,6 +103,22 @@
                                     <div class="text-danger small mt-1">{% for error in form.address.errors %}{{ error }}{% endfor %}</div>
                                 {% endif %}
                             </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.latitude.id_for_label }}" class="form-label fw-medium">Home Latitude Coordinate</label>
+                                {{ form.latitude }}
+                                {% if form.latitude.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.latitude.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                                <div class="form-text small text-muted">For finding the closest physician automatically.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.longitude.id_for_label }}" class="form-label fw-medium">Home Longitude Coordinate</label>
+                                {{ form.longitude }}
+                                {% if form.longitude.errors %}
+                                    <div class="text-danger small mt-1">{% for error in form.longitude.errors %}{{ error }}{% endfor %}</div>
+                                {% endif %}
+                                <div class="form-text small text-muted">Use decimal format (e.g. 80.2707).</div>
+                            </div>
                         {% endif %}
 
                         <!-- Conditional Doctor Fields -->

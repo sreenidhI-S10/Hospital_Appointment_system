@@ -43,17 +43,23 @@
             <div class="card card-premium p-4 mb-4">
                 <h5 class="fw-bold mb-3 text-secondary"><i class="fa-solid fa-star me-2"></i>Quick Actions</h5>
                 <div class="d-grid gap-3">
-                    <a href="{% url 'patient_doctor_list' %}" class="btn btn-primary-custom text-start py-3 shadow-sm">
-                        <i class="fa-solid fa-user-doctor me-2"></i> View Doctors Directory
+                    <a href="{% url 'doctor_discovery' %}" class="btn btn-primary-custom text-start py-3 shadow-sm">
+                        <i class="fa-solid fa-magnifying-glass me-2"></i> Find a Specialist
                     </a>
-                    <a href="{% url 'book_appointment' %}" class="btn btn-outline-primary text-start py-3">
-                        <i class="fa-solid fa-calendar-plus me-2"></i> Book Appointment Slot
+                    <a href="{% url 'hospital_list' %}" class="btn btn-outline-teal text-start py-3">
+                        <i class="fa-solid fa-hospital me-2"></i> Partner Hospitals
                     </a>
-                    <a href="{% url 'appointment_history' %}" class="btn btn-light text-start py-3 text-secondary">
-                        <i class="fa-solid fa-history me-2"></i> Appointment History
+                    <a href="{% url 'nearest_doctor_finder' %}" class="btn btn-outline-info text-start py-3">
+                        <i class="fa-solid fa-map-location-dot me-2"></i> Geolocation Doctor Finder
                     </a>
-                    <a href="{% url 'edit_profile' %}" class="btn btn-light text-start py-3 text-secondary">
-                        <i class="fa-solid fa-user-gear me-2"></i> Update Medical Profile
+                    <a href="{% url 'emergency_fast_booking' %}" class="btn btn-danger text-start py-3">
+                        <i class="fa-solid fa-truck-flash me-2"></i> Emergency Fast-Booking
+                    </a>
+                    <a href="{% url 'appointment_history' %}" class="btn btn-light text-start py-3 text-secondary border">
+                        <i class="fa-solid fa-history me-2"></i> Roster History
+                    </a>
+                    <a href="{% url 'edit_profile' %}" class="btn btn-light text-start py-3 text-secondary border">
+                        <i class="fa-solid fa-user-gear me-2"></i> Update Medical Profile & Location
                     </a>
                 </div>
             </div>
@@ -105,8 +111,8 @@
                                             <small class="badge bg-light text-muted border">{{ appointment.doctor.specialization }}</small>
                                         </td>
                                         <td>
-                                            <div class="fw-semibold"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ appointment.appointment_date }}</div>
-                                            <div class="text-muted small"><i class="fa-solid fa-clock me-1 text-muted"></i> {{ appointment.appointment_time }}</div>
+                                            <div class="fw-semibold"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ appointment.scheduled_datetime|date:"Y-m-d" }}</div>
+                                            <div class="text-muted small"><i class="fa-solid fa-clock me-1 text-muted"></i> {{ appointment.scheduled_datetime|time:"g:i A" }}</div>
                                         </td>
                                         <td>
                                             <small class="text-muted d-block text-truncate" style="max-width: 150px;">{{ appointment.reason }}</small>

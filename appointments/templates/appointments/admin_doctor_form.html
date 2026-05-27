@@ -18,7 +18,7 @@
                     </div>
                 </div>
 
-                <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" id="doctorRegistrationForm" data-doctor-validation="true" data-is-edit="{% if action == 'Edit' %}true{% else %}false{% endif %}" novalidate>
                     {% csrf_token %}
                     
                     {% if form.non_field_errors %}
@@ -46,7 +46,7 @@
                             {% else %}
                                 {{ form.username }}
                                 {% if form.username.errors %}
-                                    <div class="text-danger small mt-1">{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
+                                    <div class="invalid-feedback d-block">{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
                                 {% endif %}
                             {% endif %}
                         </div>
@@ -55,7 +55,7 @@
                             <label for="{{ form.email.id_for_label }}" class="form-label fw-medium">Email Address</label>
                             {{ form.email }}
                             {% if form.email.errors %}
-                                <div class="text-danger small mt-1">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>
+                                <div class="invalid-feedback d-block">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>
                             {% endif %}
                         </div>
                         
@@ -64,8 +64,9 @@
                                 Password {% if action == 'Edit' %}(Optional){% endif %}
                             </label>
                             {{ form.password }}
+                            <div class="form-text" id="passwordStrengthMessage">Use 8+ characters with uppercase, lowercase, number, and special character.</div>
                             {% if form.password.errors %}
-                                <div class="text-danger small mt-1">{% for error in form.password.errors %}{{ error }}{% endfor %}</div>
+                                <div class="invalid-feedback d-block">{% for error in form.password.errors %}{{ error }}{% endfor %}</div>
                             {% endif %}
                         </div>
                         
@@ -75,7 +76,7 @@
                             </label>
                             {{ form.confirm_password }}
                             {% if form.confirm_password.errors %}
-                                <div class="text-danger small mt-1">{% for error in form.confirm_password.errors %}{{ error }}{% endfor %}</div>
+                                <div class="invalid-feedback d-block">{% for error in form.confirm_password.errors %}{{ error }}{% endfor %}</div>
                             {% endif %}
                         </div>
                     </div>
@@ -88,35 +89,56 @@
                             <label for="{{ form.first_name.id_for_label }}" class="form-label fw-medium">First Name</label>
                             {{ form.first_name }}
                             {% if form.first_name.errors %}
-                                <div class="text-danger small mt-1">{% for error in form.first_name.errors %}{{ error }}{% endfor %}</div>
+                                <div class="invalid-feedback d-block">{% for error in form.first_name.errors %}{{ error }}{% endfor %}</div>
                             {% endif %}
                         </div>
                         <div class="col-md-6">
                             <label for="{{ form.last_name.id_for_label }}" class="form-label fw-medium">Last Name</label>
                             {{ form.last_name }}
                             {% if form.last_name.errors %}
-                                <div class="text-danger small mt-1">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>
+                                <div class="invalid-feedback d-block">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.hospital.id_for_label }}" class="form-label fw-medium">Hospital Facility</label>
+                            {{ form.hospital }}
+                            {% if form.hospital.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.hospital.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.department.id_for_label }}" class="form-label fw-medium">Department</label>
+                            {{ form.department }}
+                            {% if form.department.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.department.errors %}{{ error }}{% endfor %}</div>
                             {% endif %}
                         </div>
                         <div class="col-md-6">
                             <label for="{{ form.specialization.id_for_label }}" class="form-label fw-medium">Specialization Area</label>
                             {{ form.specialization }}
                             {% if form.specialization.errors %}
-                                <div class="text-danger small mt-1">{% for error in form.specialization.errors %}{{ error }}{% endfor %}</div>
+                                <div class="invalid-feedback d-block">{% for error in form.specialization.errors %}{{ error }}{% endfor %}</div>
                             {% endif %}
                         </div>
                         <div class="col-md-6">
                             <label for="{{ form.experience.id_for_label }}" class="form-label fw-medium">Years of Experience</label>
                             {{ form.experience }}
                             {% if form.experience.errors %}
-                                <div class="text-danger small mt-1">{% for error in form.experience.errors %}{{ error }}{% endfor %}</div>
+                                <div class="invalid-feedback d-block">{% for error in form.experience.errors %}{{ error }}{% endfor %}</div>
                             {% endif %}
                         </div>
                         <div class="col-md-6">
                             <label for="{{ form.phone.id_for_label }}" class="form-label fw-medium">Direct Phone Number</label>
                             {{ form.phone }}
                             {% if form.phone.errors %}
-                                <div class="text-danger small mt-1">{% for error in form.phone.errors %}{{ error }}{% endfor %}</div>
+                                <div class="invalid-feedback d-block">{% for error in form.phone.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.consultation_fees.id_for_label }}" class="form-label fw-medium">Consultation Fees ($)</label>
+                            {{ form.consultation_fees }}
+                            {% if form.consultation_fees.errors %}
+                                <div class="invalid-feedback d-block">{% for error in form.consultation_fees.errors %}{{ error }}{% endfor %}</div>
                             {% endif %}
                         </div>
                         
@@ -134,9 +156,9 @@
                             {% endif %}
                             
                             {{ form.profile_image }}
-                            <div class="form-text text-muted">Leave blank if you wish to keep the existing image or use the default placeholder.</div>
+                            <div class="form-text text-muted">Leave blank to keep the existing image. Supports JPG, JPEG, or PNG files up to 2MB.</div>
                             {% if form.profile_image.errors %}
-                                <div class="text-danger small mt-1">{% for error in form.profile_image.errors %}{{ error }}{% endfor %}</div>
+                                <div class="invalid-feedback d-block">{% for error in form.profile_image.errors %}{{ error }}{% endfor %}</div>
                             {% endif %}
                         </div>
                     </div>
@@ -146,7 +168,7 @@
                         <a href="{% url 'admin_dashboard' %}" class="btn btn-light px-4">
                             Cancel
                         </a>
-                        <button type="submit" class="btn btn-primary-custom px-4">
+                        <button type="submit" class="btn btn-primary-custom px-4" id="doctorSubmitButton" disabled>
                             <i class="fa-solid fa-circle-check me-2"></i> Save Doctor Profile
                         </button>
                     </div>
@@ -155,4 +177,101 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('doctorRegistrationForm');
+        if (!form) return;
+
+        const submitButton = document.getElementById('doctorSubmitButton');
+        const passwordMessage = document.getElementById('passwordStrengthMessage');
+        const isEdit = form.dataset.isEdit === 'true';
+        const fields = {
+            username: document.getElementById('id_username'),
+            email: document.getElementById('id_email'),
+            password: document.getElementById('id_password'),
+            confirmPassword: document.getElementById('id_confirm_password'),
+            firstName: document.getElementById('id_first_name'),
+            lastName: document.getElementById('id_last_name'),
+            hospital: document.getElementById('id_hospital'),
+            specialization: document.getElementById('id_specialization'),
+            experience: document.getElementById('id_experience'),
+            phone: document.getElementById('id_phone'),
+            consultationFees: document.getElementById('id_consultation_fees'),
+            profileImage: document.getElementById('id_profile_image')
+        };
+
+        const rules = {
+            username: value => isEdit || /^[A-Za-z0-9_]{4,}$/.test(value.trim()),
+            email: value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()),
+            password: value => isEdit && value.length === 0 ? true : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(value),
+            confirmPassword: value => (isEdit && !fields.password.value && !value) || value === fields.password.value,
+            name: value => /^[A-Za-z]{2,}$/.test(value.trim()),
+            hospital: value => value.trim().length > 0,
+            specialization: value => value.trim().length > 0 && !/^\d+$/.test(value.trim()),
+            experience: value => /^\d+$/.test(value) && Number(value) >= 0 && Number(value) <= 50,
+            phone: value => /^\d{10}$/.test(value.trim()),
+            consultationFees: value => !isNaN(parseFloat(value)) && parseFloat(value) >= 0,
+            profileImage: input => {
+                if (!input || !input.files.length) return true;
+                const file = input.files[0];
+                const allowedTypes = ['image/jpeg', 'image/png'];
+                return allowedTypes.includes(file.type) && file.size <= 2 * 1024 * 1024;
+            }
+        };
+
+        function setState(input, valid, message) {
+            if (!input) return valid;
+            input.classList.toggle('is-valid', valid && input.type !== 'hidden');
+            input.classList.toggle('is-invalid', !valid && input.type !== 'hidden');
+
+            let feedback = input.parentElement.querySelector('.live-feedback');
+            if (!feedback && input.type !== 'hidden') {
+                feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback live-feedback';
+                input.insertAdjacentElement('afterend', feedback);
+            }
+            if (feedback) feedback.textContent = valid ? '' : message;
+            return valid;
+        }
+
+        function updatePasswordMessage(valid) {
+            if (!passwordMessage) return;
+            passwordMessage.classList.toggle('text-success', valid);
+            passwordMessage.classList.toggle('text-danger', !valid && fields.password.value.length > 0);
+            passwordMessage.textContent = valid
+                ? 'Strong password.'
+                : 'Use 8+ characters with uppercase, lowercase, number, and special character.';
+        }
+
+        function validateForm() {
+            const results = [
+                setState(fields.username, rules.username(fields.username ? fields.username.value : ''), 'Use at least 4 characters: letters, numbers, and underscores only.'),
+                setState(fields.email, rules.email(fields.email.value), 'Enter a valid email address.'),
+                setState(fields.password, rules.password(fields.password.value), 'Password must include uppercase, lowercase, number, special character, and 8+ characters.'),
+                setState(fields.confirmPassword, rules.confirmPassword(fields.confirmPassword.value), 'Passwords do not match.'),
+                setState(fields.firstName, rules.name(fields.firstName.value), 'First name must be alphabets only and at least 2 characters.'),
+                setState(fields.lastName, rules.name(fields.lastName.value), 'Last name must be alphabets only and at least 2 characters.'),
+                setState(fields.hospital, rules.hospital(fields.hospital ? fields.hospital.value : ''), 'Please select a hospital facility.'),
+                setState(fields.specialization, rules.specialization(fields.specialization.value), 'Specialization is required and cannot be numbers only.'),
+                setState(fields.experience, rules.experience(fields.experience.value), 'Experience must be a number between 0 and 50.'),
+                setState(fields.phone, rules.phone(fields.phone.value), 'Phone number must be exactly 10 digits.'),
+                setState(fields.consultationFees, rules.consultationFees(fields.consultationFees.value), 'Please specify a valid numeric consultation fee.'),
+                setState(fields.profileImage, rules.profileImage(fields.profileImage), 'Profile image must be JPG, JPEG, or PNG and no larger than 2MB.')
+            ];
+
+            updatePasswordMessage(results[2]);
+            submitButton.disabled = !results.every(Boolean);
+        }
+
+        Object.values(fields).forEach(function (field) {
+            if (!field) return;
+            field.addEventListener('input', validateForm);
+            field.addEventListener('change', validateForm);
+        });
+        validateForm();
+    });
+</script>
 {% endblock %}

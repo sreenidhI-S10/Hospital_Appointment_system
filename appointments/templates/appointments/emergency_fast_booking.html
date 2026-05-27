@@ -1,0 +1,143 @@
+{% extends 'appointments/base.html' %}
+{% load static %}
+
+{% block title %}Emergency Fast-Booking - HopeLife Platform{% endblock %}
+
+{% block content %}
+<!-- Emergency Animated Header -->
+<div class="hero-gradient mb-5 bg-danger" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;">
+    <div class="container py-4 text-center text-md-start">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <span class="badge bg-white bg-opacity-20 px-3 py-2 rounded-pill mb-3 text-uppercase fw-semibold tracking-wider text-white">
+                    <i class="fa-solid fa-bell-on pulse-loader"></i> Priority Dispatch
+                </span>
+                <h1 class="display-5 fw-bold text-white mb-2">Emergency Fast Booking</h1>
+                <p class="lead text-white-70 mb-0">Book an immediate consultation with on-duty emergency physicians. Your slot will be auto-approved instantly.</p>
+            </div>
+            <div class="col-md-4 text-end d-none d-md-block">
+                <i class="fa-solid fa-truck-medical fs-1 text-white opacity-25" style="font-size: 8rem;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row g-4 justify-content-center">
+        <div class="col-lg-10">
+            <!-- Alert Warning -->
+            <div class="alert alert-danger d-flex align-items-start gap-3 p-4 mb-5 border-0 shadow-sm rounded-4">
+                <i class="fa-solid fa-triangle-exclamation fs-3 mt-1 text-danger"></i>
+                <div>
+                    <h5 class="fw-bold mb-1 text-danger">For Serious Life-Threatening Emergencies</h5>
+                    <p class="mb-0 text-danger-emphasis small">Please dial your local emergency services (like 911/112) immediately. This portal is for urgent medical bookings and fast-track doctor dispatch at our physical facilities.</p>
+                </div>
+            </div>
+
+            <!-- On-Duty Emergency Doctors -->
+            <h4 class="fw-bold mb-4 text-dark d-flex align-items-center gap-2">
+                <i class="fa-solid fa-heart-pulse text-danger"></i>
+                <span>Available Emergency Clinics & Specialists</span>
+            </h4>
+
+            {% if doctors %}
+                <form id="emergency-booking-form" method="POST" class="no-loader">
+                    {% csrf_type %}
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        {% for doc in doctors %}
+                            <div class="col-md-6">
+                                <label class="w-100 h-100 card glass-card border border-2 border-transparent p-4 text-start position-relative cursor-pointer hover-lift shadow-sm" style="display: block;">
+                                    <!-- Radio input hidden visually but fully functional -->
+                                    <input type="radio" name="doctor_id" value="{{ doc.id }}" class="position-absolute top-0 end-0 m-4 cursor-pointer" required style="width: 1.5rem; height: 1.5rem; accent-color: #dc2626;">
+                                    
+                                    <div class="d-flex align-items-center gap-3 mb-3 me-4">
+                                        {% if doc.profile_image %}
+                                            <img src="{{ doc.profile_image.url }}" alt="{{ doc.user.first_name }}" class="doctor-avatar-circle" style="width: 50px; height: 50px;">
+                                        {% else %}
+                                            <div class="doctor-avatar-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center fw-bold fs-5" style="width: 50px; height: 50px;">
+                                                {{ doc.user.first_name|slice:":1" }}{{ doc.user.last_name|slice:":1" }}
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <h5 class="fw-bold mb-0 text-dark">Dr. {{ doc.user.first_name }} {{ doc.user.last_name }}</h5>
+                                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2 py-1 fs-8 mt-1 border-0">{{ doc.specialization }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-secondary small mt-3 pt-3 border-top">
+                                        <div class="d-flex align-items-center gap-2 mb-1.5">
+                                            <i class="fa-solid fa-hospital text-muted"></i>
+                                            <span>Facility: <strong>{{ doc.hospital.hospital_name }}</strong></span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-location-dot text-muted"></i>
+                                            <span>Location: <strong>{{ doc.hospital.city }}, {{ doc.hospital.state }}</strong></span>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="text-center mt-5">
+                        <button type="submit" id="submit-emergency-btn" class="btn btn-danger btn-lg px-5 py-3 shadow-lg d-inline-flex align-items-center gap-2 rounded-pill fw-bold hover-scale">
+                            <i class="fa-solid fa-truck-flash pulse-loader"></i>
+                            <span>Confirm Instant Booking</span>
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="glass-card p-5 text-center shadow-sm border-0">
+                    <i class="fa-solid fa-user-slash fs-1 text-muted opacity-25 mb-3"></i>
+                    <h5 class="fw-bold">No Emergency Physicians Available</h5>
+                    <p class="text-muted small">All partner emergency medical departments are currently at capacity. Please dial local emergency numbers for support.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('emergency-booking-form');
+        const submitBtn = document.getElementById('submit-emergency-btn');
+
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                const selectedDoctor = form.querySelector('input[name="doctor_id"]:checked');
+                
+                if (!selectedDoctor) {
+                    e.preventDefault();
+                    alert('Please select an available emergency specialist from the options above.');
+                    return;
+                }
+
+                // Show urgent emergency-themed loader
+                showEmergencyLoader();
+            });
+        }
+    });
+
+    function showEmergencyLoader() {
+        const loader = document.createElement('div');
+        loader.id = 'emergency-page-loader';
+        loader.innerHTML = `
+            <div class="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center" style="background: rgba(185, 28, 28, 0.9); z-index: 9999; backdrop-filter: blur(6px);">
+                <div class="glass-card p-5 text-center d-flex flex-column align-items-center justify-content-center" style="max-width: 400px; background: rgba(255, 255, 255, 0.98); border: 2px solid #dc2626;">
+                    <i class="fa-solid fa-truck-medical text-danger fs-1 mb-3 pulse-loader" style="font-size: 4rem;"></i>
+                    <h4 class="fw-bold text-danger mb-2">Assigning ER Roster</h4>
+                    <p class="text-secondary small mb-4">Securing instant approval, generating token ID, and reserving clinic room. Do not refresh this page.</p>
+                    <div class="progress w-100" style="height: 6px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(loader);
+    }
+</script>
+{% endblock %}

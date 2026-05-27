@@ -1,0 +1,90 @@
+{% extends 'appointments/base.html' %}
+{% load static %}
+
+{% block title %}Hospitals - HopeLife Platform{% endblock %}
+
+{% block content %}
+<!-- Animated Hero Banner -->
+<div class="hero-gradient mb-5 text-center text-lg-start">
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-white bg-opacity-20 px-3 py-2 rounded-pill mb-3 text-uppercase fw-semibold tracking-wider text-white">Verified Care Networks</span>
+                <h1 class="display-5 fw-bold text-white mb-3">Discover Partner Hospitals</h1>
+                <p class="lead text-white-70 mb-0">Browse modern clinics and hospitals equipped with cutting-edge medical services and instant emergency bookings.</p>
+            </div>
+            <div class="col-lg-4 text-center d-none d-lg-block">
+                <i class="fa-solid fa-hospital-user fs-1 text-white opacity-25" style="font-size: 8rem;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- Grid of Hospitals -->
+    <div class="row g-4">
+        {% if hospitals %}
+            {% for hospital in hospitals %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card glass-card h-100 overflow-hidden hover-lift border-0 shadow-sm">
+                        <!-- Hospital Header Image -->
+                        <div class="position-relative" style="height: 200px; background-color: #f1f5f9;">
+                            {% if hospital.hospital_image %}
+                                <img src="{{ hospital.hospital_image.url }}" alt="{{ hospital.hospital_name }}" class="w-100 h-100 object-fit-cover">
+                            {% else %}
+                                <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-teal bg-opacity-10 text-teal">
+                                    <i class="fa-regular fa-hospital fs-1 mb-2"></i>
+                                    <span class="small fw-semibold">No Image Uploaded</span>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Emergency Availability Badge -->
+                            <div class="position-absolute top-0 end-0 m-3">
+                                {% if hospital.emergency_available %}
+                                    <span class="badge bg-danger px-3 py-2 rounded-pill shadow d-flex align-items-center gap-1">
+                                        <i class="fa-solid fa-truck-flash pulse-loader"></i> Emergency Ready
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary px-3 py-2 rounded-pill bg-opacity-75">
+                                        General Care Only
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Hospital Body Details -->
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h4 class="card-title fw-bold mb-2 text-dark">{{ hospital.hospital_name }}</h4>
+                            <p class="text-muted small mb-3 flex-grow-1">{{ hospital.hospital_description|truncatewords:20 }}</p>
+                            
+                            <div class="border-top pt-3 mt-auto">
+                                <div class="d-flex align-items-center gap-2 mb-2 text-secondary small">
+                                    <i class="fa-solid fa-location-dot text-teal"></i>
+                                    <span>{{ hospital.city }}, {{ hospital.state }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 mb-3 text-secondary small">
+                                    <i class="fa-solid fa-phone text-primary"></i>
+                                    <span>{{ hospital.contact_number }}</span>
+                                </div>
+                                
+                                <a href="{% url 'hospital_detail' hospital.id %}" class="btn btn-primary-custom w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                                    <span>Explore Facilities</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="glass-card p-5 max-width-600 mx-auto">
+                    <i class="fa-solid fa-circle-info fs-1 text-teal mb-3"></i>
+                    <h4 class="fw-bold">No Hospitals Found</h4>
+                    <p class="text-muted">We currently don't have any registered hospital facilities in the network. Check back soon!</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -24,49 +24,110 @@
 <body>
 
     <!-- Responsive Role-Based Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-3">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-3 shadow">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="fa-solid fa-hospital-user text-primary"></i>
-                <span>HopeLife Clinic</span>
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+                <i class="fa-solid fa-house-chimney-medical fs-4" style="color: #06b6d4;"></i>
+                <span class="fw-bold" style="background: linear-gradient(to right, #ffffff, #93c5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">HopeLife Platform</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav me-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                            <i class="fa-solid fa-house me-1"></i> Home
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'hospital_list' or request.resolver_match.url_name == 'hospital_detail' %}active{% endif %}" href="{% url 'hospital_list' %}">
+                            <i class="fa-solid fa-hospital me-1"></i> Hospitals
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'doctor_discovery' %}active{% endif %}" href="{% url 'doctor_discovery' %}">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> Find Doctors
+                        </a>
                     </li>
                     
                     {% if request.user.is_authenticated %}
-                        <!-- Role-based navigation -->
+                        <!-- Role-based dynamic dropdowns -->
                         {% if request.user.role == 'admin' or request.user.is_superuser %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-1" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-user-shield me-1"></i> Admin Portal
+                                </a>
+                                <ul class="dropdown-menu border-0 shadow-lg mt-2" aria-labelledby="adminDropdown">
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'admin_dashboard' %}">
+                                            <i class="fa-solid fa-chart-line text-teal me-2"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'admin_hospital_list' %}">
+                                            <i class="fa-solid fa-hospital text-info me-2"></i> Manage Hospitals
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'admin_add_doctor' %}">
+                                            <i class="fa-solid fa-user-plus text-success me-2"></i> Add Doctor
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         {% elif request.user.role == 'doctor' %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'doctor_dashboard' %}active{% endif %}" href="{% url 'doctor_dashboard' %}">Doctor Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'edit_profile' %}active{% endif %}" href="{% url 'edit_profile' %}">Edit Profile</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-1" href="#" id="doctorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-user-doctor me-1"></i> Doctor Portal
+                                </a>
+                                <ul class="dropdown-menu border-0 shadow-lg mt-2" aria-labelledby="doctorDropdown">
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'doctor_dashboard' %}">
+                                            <i class="fa-solid fa-clipboard-list text-primary me-2"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'doctor_manage_availability' %}">
+                                            <i class="fa-solid fa-calendar-days text-success me-2"></i> Manage Availability
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         {% elif request.user.role == 'patient' %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'patient_dashboard' %}active{% endif %}" href="{% url 'patient_dashboard' %}">Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'patient_doctor_list' %}active{% endif %}" href="{% url 'patient_doctor_list' %}">Doctors</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'book_appointment' or request.resolver_match.url_name == 'book_appointment_with_doctor' %}active{% endif %}" href="{% url 'book_appointment' %}">Book Appointment</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'appointment_history' %}active{% endif %}" href="{% url 'appointment_history' %}">My History</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.url_name == 'edit_profile' %}active{% endif %}" href="{% url 'edit_profile' %}">Edit Profile</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-1" href="#" id="patientDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-kit-medical me-1"></i> Medical Services
+                                </a>
+                                <ul class="dropdown-menu border-0 shadow-lg mt-2" aria-labelledby="patientDropdown">
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'patient_dashboard' %}">
+                                            <i class="fa-solid fa-gauge text-primary me-2"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'book_appointment' %}">
+                                            <i class="fa-solid fa-calendar-check text-success me-2"></i> Book Appointment
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'nearest_doctor_finder' %}">
+                                            <i class="fa-solid fa-map-location-dot text-info me-2"></i> Nearest Doctor
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'emergency_fast_booking' %}">
+                                            <i class="fa-solid fa-truck-medical text-danger me-2"></i> Emergency Booking
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'appointment_history' %}">
+                                            <i class="fa-solid fa-history text-warning me-2"></i> History & Cancel
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         {% endif %}
                     {% endif %}
@@ -87,7 +148,7 @@
                                     {% endif %}
                                 </span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="userDropdown" style="min-width: 200px;">
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="userDropdown" style="min-width: 200px;">
                                 {% if request.user.role == 'doctor' or request.user.role == 'patient' %}
                                     <li>
                                         <a class="dropdown-item py-2" href="{% url 'edit_profile' %}">
@@ -118,7 +179,7 @@
                             <a class="btn btn-primary-custom btn-sm dropdown-toggle px-3" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa-solid fa-user-plus me-1"></i> Register
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2">
                                 <li>
                                     <a class="dropdown-item py-2" href="{% url 'patient_register' %}">
                                         <i class="fa-solid fa-bed-pulse text-primary me-2"></i> As Patient
@@ -141,7 +202,7 @@
     <div class="container my-4">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% else %}success{% endif %} alert-dismissible fade show flash-message" role="alert">
                     <div class="d-flex align-items-center">
                         {% if message.tags == 'error' %}
                             <i class="fa-solid fa-circle-xmark me-2 fs-5"></i>
@@ -186,6 +247,16 @@
 
     <!-- Bootstrap 5 Bundle JS with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.flash-message').forEach(function (message) {
+                setTimeout(function () {
+                    bootstrap.Alert.getOrCreateInstance(message).close();
+                }, 7000);
+            });
+        });
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>

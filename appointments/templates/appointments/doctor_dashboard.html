@@ -74,8 +74,8 @@
                                     <div class="text-muted small">{{ appointment.patient.gender }}</div>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ appointment.appointment_date }}</div>
-                                    <div class="text-muted small"><i class="fa-solid fa-clock me-1 text-muted"></i> {{ appointment.appointment_time }}</div>
+                                    <div class="fw-semibold"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ appointment.scheduled_datetime|date:"Y-m-d" }}</div>
+                                    <div class="text-muted small"><i class="fa-solid fa-clock me-1 text-muted"></i> {{ appointment.scheduled_datetime|time:"g:i A" }}</div>
                                 </td>
                                 <td>
                                     <small class="text-muted d-block" style="max-width: 250px; white-space: normal; word-wrap: break-word;">

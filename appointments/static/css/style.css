@@ -2,15 +2,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --primary-color: #2563eb;
-    --primary-hover: #1d4ed8;
-    --secondary-color: #0f172a;
-    --background-color: #f8fafc;
-    --card-bg: #ffffff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border-color: #e2e8f0;
+    --primary-color: #0d9488; /* Modern Teal */
+    --primary-hover: #0f766e; /* Darker Teal */
+    --secondary-color: #1e3a8a; /* Deep Royal Blue */
+    --secondary-hover: #1d4ed8; /* Electric Blue */
+    --accent-color: #06b6d4; /* Bright Cyan */
+    --background-color: #f8fafc; /* Slate background */
+    --card-bg: rgba(255, 255, 255, 0.85); /* For glassmorphism */
+    --text-main: #0f172a; /* Slate 900 */
+    --text-muted: #475569; /* Slate 600 */
+    --border-color: rgba(226, 232, 240, 0.8);
     
+    /* Gradient backgrounds */
+    --teal-blue-gradient: linear-gradient(135deg, #0d9488 0%, #2563eb 100%);
+    --bg-gradient: linear-gradient(180deg, #f0fdfa 0%, #eff6ff 100%);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.06);
+
     /* Status Colors */
     --status-pending-bg: #fffbeb;
     --status-pending-text: #b45309;
@@ -274,3 +283,170 @@ footer a:hover {
     margin: 0 auto;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
+
+/* Glassmorphism Styles */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 16px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.12);
+}
+
+.glass-form {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+/* Premium Gradient Hero */
+.hero-gradient {
+    background: var(--teal-blue-gradient);
+    background-size: 200% 200%;
+    animation: gradientShift 10s ease infinite;
+    color: white;
+    padding: 5rem 0;
+    border-bottom: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-gradient::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 80%);
+    animation: rotateBg 20s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes rotateBg {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hover Animations */
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.hover-scale {
+    transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.03);
+}
+
+/* Sidebar Styling */
+.filter-sidebar {
+    background: var(--glass-bg);
+    border-right: 1px solid var(--border-color);
+    padding: 1.5rem;
+    height: 100%;
+    border-radius: 16px;
+}
+
+/* Custom Pulse Loading State */
+@keyframes pulse-teal-blue {
+    0% {
+        transform: scale(0.98);
+        opacity: 0.9;
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4);
+    }
+    50% {
+        transform: scale(1.02);
+        opacity: 1;
+        box-shadow: 0 0 0 8px rgba(13, 148, 136, 0);
+    }
+    100% {
+        transform: scale(0.98);
+        opacity: 0.9;
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
+    }
+}
+
+.pulse-loader {
+    animation: pulse-teal-blue 2s infinite ease-in-out;
+}
+
+/* Availability Badge Classes */
+.badge-available {
+    background-color: #e6fffa;
+    color: #0d9488;
+    border: 1px solid rgba(13, 148, 136, 0.2);
+}
+
+.badge-unavailable {
+    background-color: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid rgba(229, 62, 62, 0.2);
+}
+
+/* Navbar Upgrades */
+.navbar-custom {
+    background: rgba(30, 58, 138, 0.95) !important; /* Deep Blue background with slight transparency */
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar-custom .navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #ffffff, #93c5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.navbar-custom .nav-link {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.navbar-custom .nav-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.navbar-custom .dropdown-menu {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.05);
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(4px);
+}
+
+/* Modern Form Upgrades */
+.form-section-header {
+    background: var(--teal-blue-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+

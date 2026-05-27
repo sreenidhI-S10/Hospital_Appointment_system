@@ -70,6 +70,31 @@
                         </div>
                     </div>
 
+                    <!-- Appointment Type & Mode Row -->
+                    <div class="row g-3 mb-4">
+                        <!-- Appointment Type -->
+                        <div class="col-md-6">
+                            <label for="{{ form.appointment_type.id_for_label }}" class="form-label fw-semibold text-secondary">
+                                <i class="fa-solid fa-list me-1 text-primary"></i> Appointment Type
+                            </label>
+                            {{ form.appointment_type }}
+                            {% if form.appointment_type.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.appointment_type.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Consultation Mode -->
+                        <div class="col-md-6">
+                            <label for="{{ form.consultation_mode.id_for_label }}" class="form-label fw-semibold text-secondary">
+                                <i class="fa-solid fa-video me-1 text-primary"></i> Consultation Mode
+                            </label>
+                            {{ form.consultation_mode }}
+                            {% if form.consultation_mode.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.consultation_mode.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
                     <!-- Reason -->
                     <div class="mb-4">
                         <label for="{{ form.reason.id_for_label }}" class="form-label fw-semibold text-secondary">
