@@ -47,11 +47,13 @@
                         </a>
                     </li>
                     
+                    {% if not request.user.is_authenticated or request.user.role != 'doctor' %}
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'doctor_discovery' %}active{% endif %}" href="{% url 'doctor_discovery' %}">
                             <i class="fa-solid fa-magnifying-glass me-1"></i> Find Doctors
                         </a>
                     </li>
+                    {% endif %}
                     
                     {% if request.user.is_authenticated %}
                         <!-- Role-based dynamic dropdowns -->

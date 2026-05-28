@@ -25,11 +25,15 @@
         <!-- Add New Slot Form -->
         <div class="col-lg-5 col-md-12">
             <div class="glass-card p-4 border-0 shadow-sm">
-                <h4 class="fw-bold mb-4 form-section-header">Add Availability Slot</h4>
+                <h4 class="fw-bold mb-4 form-section-header">
+                    {% if editing_slot %}Edit Availability Slot{% else %}Add Availability Slot{% endif %}
+                </h4>
                 
                 <form method="POST">
-                    {% csrf_type %}
                     {% csrf_token %}
+                    {% if editing_slot %}
+                        <input type="hidden" name="slot_id" value="{{ editing_slot.id }}">
+                    {% endif %}
                     
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger p-2 small">
@@ -42,13 +46,13 @@
                         <label class="form-label small text-muted text-uppercase fw-bold">{{ form.day_of_week.label }}</label>
                         <select name="{{ form.day_of_week.name }}" class="form-select {% if form.day_of_week.errors %}is-invalid{% endif %}" required>
                             <option value="">Choose Day...</option>
-                            <option value="0">Monday</option>
-                            <option value="1">Tuesday</option>
-                            <option value="2">Wednesday</option>
-                            <option value="3">Thursday</option>
-                            <option value="4">Friday</option>
-                            <option value="5">Saturday</option>
-                            <option value="6">Sunday</option>
+                            <option value="0" {% if form.day_of_week.value|stringformat:"s" == "0" %}selected{% endif %}>Monday</option>
+                            <option value="1" {% if form.day_of_week.value|stringformat:"s" == "1" %}selected{% endif %}>Tuesday</option>
+                            <option value="2" {% if form.day_of_week.value|stringformat:"s" == "2" %}selected{% endif %}>Wednesday</option>
+                            <option value="3" {% if form.day_of_week.value|stringformat:"s" == "3" %}selected{% endif %}>Thursday</option>
+                            <option value="4" {% if form.day_of_week.value|stringformat:"s" == "4" %}selected{% endif %}>Friday</option>
+                            <option value="5" {% if form.day_of_week.value|stringformat:"s" == "5" %}selected{% endif %}>Saturday</option>
+                            <option value="6" {% if form.day_of_week.value|stringformat:"s" == "6" %}selected{% endif %}>Sunday</option>
                         </select>
                         {% if form.day_of_week.errors %}
                             <div class="invalid-feedback">{{ form.day_of_week.errors|join:", " }}</div>
@@ -59,14 +63,14 @@
                     <div class="row mb-3">
                         <div class="col-md-6 col-sm-12">
                             <label class="form-label small text-muted text-uppercase fw-bold">{{ form.start_time.label }}</label>
-                            <input type="time" name="{{ form.start_time.name }}" class="form-control {% if form.start_time.errors %}is-invalid{% endif %}" required>
+                            <input type="time" name="{{ form.start_time.name }}" value="{{ form.start_time.value|time:'H:i' }}" class="form-control {% if form.start_time.errors %}is-invalid{% endif %}" required>
                             {% if form.start_time.errors %}
                                 <div class="invalid-feedback">{{ form.start_time.errors|join:", " }}</div>
                             {% endif %}
                         </div>
                         <div class="col-md-6 col-sm-12">
                             <label class="form-label small text-muted text-uppercase fw-bold">{{ form.end_time.label }}</label>
-                            <input type="time" name="{{ form.end_time.name }}" class="form-control {% if form.end_time.errors %}is-invalid{% endif %}" required>
+                            <input type="time" name="{{ form.end_time.name }}" value="{{ form.end_time.value|time:'H:i' }}" class="form-control {% if form.end_time.errors %}is-invalid{% endif %}" required>
                             {% if form.end_time.errors %}
                                 <div class="invalid-feedback">{{ form.end_time.errors|join:", " }}</div>
                             {% endif %}
@@ -77,18 +81,23 @@
                     <div class="mb-4">
                         <label class="form-label small text-muted text-uppercase fw-bold">{{ form.consultation_mode.label }}</label>
                         <select name="{{ form.consultation_mode.name }}" class="form-select {% if form.consultation_mode.errors %}is-invalid{% endif %}" required>
-                            <option value="in_person">In-person</option>
-                            <option value="video">Video consultation</option>
+                            <option value="in_person" {% if form.consultation_mode.value == "in_person" %}selected{% endif %}>In-person</option>
+                            <option value="video" {% if form.consultation_mode.value == "video" %}selected{% endif %}>Video consultation</option>
                         </select>
                         {% if form.consultation_mode.errors %}
                             <div class="invalid-feedback">{{ form.consultation_mode.errors|join:", " }}</div>
                         {% endif %}
                     </div>
 
-                    <button type="submit" class="btn btn-primary-custom w-100 py-3 d-flex align-items-center justify-content-center gap-2">
-                        <i class="fa-solid fa-calendar-plus"></i>
-                        <span>Register Availability Slot</span>
-                    </button>
+                    <div class="d-flex flex-column gap-2">
+                        <button type="submit" class="btn btn-primary-custom w-100 py-3 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-solid {% if editing_slot %}fa-floppy-disk{% else %}fa-calendar-plus{% endif %}"></i>
+                            <span>{% if editing_slot %}Save Slot Changes{% else %}Register Availability Slot{% endif %}</span>
+                        </button>
+                        {% if editing_slot %}
+                            <a href="{% url 'doctor_manage_availability' %}" class="btn btn-light w-100 py-2">Cancel Edit</a>
+                        {% endif %}
+                    </div>
                 </form>
             </div>
         </div>
@@ -107,6 +116,7 @@
                                     <th>Hours</th>
                                     <th>Mode</th>
                                     <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -134,6 +144,21 @@
                                             <span class="badge badge-available px-3 py-1.5 rounded-pill d-inline-flex align-items-center gap-1.5">
                                                 <span class="spinner-grow bg-teal spinner-grow-sm" role="status" style="width: 8px; height: 8px;"></span> Active
                                             </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <a href="{% url 'doctor_manage_availability' %}?edit={{ slot.id }}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                    <span>Edit</span>
+                                                </a>
+                                                <form method="POST" action="{% url 'doctor_delete_availability' slot.id %}" class="d-inline" onsubmit="return confirm('Delete this availability slot?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                        <span>Delete</span>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}

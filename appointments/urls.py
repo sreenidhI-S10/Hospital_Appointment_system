@@ -46,6 +46,10 @@ urlpatterns = [
     path('doctor/status/<int:appointment_id>/', views.doctor_update_status, name='doctor_update_status'),
     path('doctor/patient/<int:patient_id>/', views.doctor_view_patient, name='doctor_view_patient'),
     path('doctor/availability/', views.doctor_manage_availability, name='doctor_manage_availability'),
+    path('doctor/availability/<int:slot_id>/delete/', views.doctor_delete_availability, name='doctor_delete_availability'),
+
+    # Admin appointment edit access
+    path('admin/appointment/status/<int:appointment_id>/', views.admin_update_appointment_status, name='admin_update_appointment_status'),
 
     # Patient Views
     path('doctors/', views.patient_doctor_list, name='patient_doctor_list'),

@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
+from django.utils import timezone
 from .models import User, DoctorProfile, PatientProfile, Appointment, Hospital, Department, DoctorAvailability
 
 class BootstrapFormMixin:
@@ -421,6 +422,13 @@ class AppointmentForm(BootstrapFormMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['doctor'].queryset = DoctorProfile.objects.all().select_related('user')
         self.fields['doctor'].label_from_instance = lambda obj: f"Dr. {obj.user.first_name} {obj.user.last_name} ({obj.specialization})"
+        self.fields['appointment_date'].widget.attrs['min'] = timezone.localdate().isoformat()
+
+    def clean_appointment_date(self):
+        appointment_date = self.cleaned_data.get('appointment_date')
+        if appointment_date and appointment_date < timezone.localdate():
+            raise forms.ValidationError('Appointments can only be booked for today or a future date.')
+        return appointment_date
 
     def clean(self):
         cleaned_data = super().clean()

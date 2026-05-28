@@ -177,6 +177,8 @@
         const submitButton = document.getElementById('doctorSubmitButton');
         const passwordMessage = document.getElementById('passwordStrengthMessage');
         const isEdit = form.dataset.isEdit === 'true';
+        const touchedFields = new Set();
+        let submitted = false;
         const fields = {
             username: document.getElementById('id_username'),
             email: document.getElementById('id_email'),
@@ -209,8 +211,9 @@
 
         function setState(input, valid, message) {
             if (!input) return valid;
-            input.classList.toggle('is-valid', valid);
-            input.classList.toggle('is-invalid', !valid);
+            const shouldShowFeedback = submitted || touchedFields.has(input);
+            input.classList.toggle('is-valid', shouldShowFeedback && valid);
+            input.classList.toggle('is-invalid', shouldShowFeedback && !valid);
 
             let feedback = input.parentElement.querySelector('.live-feedback');
             if (!feedback) {
@@ -218,15 +221,16 @@
                 feedback.className = 'invalid-feedback live-feedback';
                 input.insertAdjacentElement('afterend', feedback);
             }
-            feedback.textContent = valid ? '' : message;
+            feedback.textContent = shouldShowFeedback && !valid ? message : '';
             return valid;
         }
 
         function updatePasswordMessage(valid) {
             if (!passwordMessage) return;
-            passwordMessage.classList.toggle('text-success', valid);
-            passwordMessage.classList.toggle('text-danger', !valid && fields.password.value.length > 0);
-            passwordMessage.textContent = valid
+            const shouldShowFeedback = submitted || touchedFields.has(fields.password);
+            passwordMessage.classList.toggle('text-success', shouldShowFeedback && valid);
+            passwordMessage.classList.toggle('text-danger', shouldShowFeedback && !valid && fields.password.value.length > 0);
+            passwordMessage.textContent = shouldShowFeedback && valid
                 ? 'Strong password.'
                 : 'Use 8+ characters with uppercase, lowercase, number, and special character.';
         }
@@ -251,9 +255,24 @@
 
         Object.values(fields).forEach(function (field) {
             if (!field) return;
-            field.addEventListener('input', validateForm);
-            field.addEventListener('change', validateForm);
+            field.addEventListener('input', function () {
+                touchedFields.add(field);
+                validateForm();
+            });
+            field.addEventListener('change', function () {
+                touchedFields.add(field);
+                validateForm();
+            });
         });
+
+        form.addEventListener('submit', function () {
+            submitted = true;
+            Object.values(fields).forEach(function (field) {
+                if (field) touchedFields.add(field);
+            });
+            validateForm();
+        });
+
         validateForm();
     });
 </script>

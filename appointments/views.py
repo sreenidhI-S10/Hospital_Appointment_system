@@ -1,5 +1,6 @@
 import json
 import math
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -9,6 +10,7 @@ from django.db.models import Count, Q
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import JsonResponse
+from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.conf import settings
 from functools import wraps
@@ -24,6 +26,8 @@ from .forms import (
     DoctorAvailabilityForm,
     HospitalForm,
 )
+
+logger = logging.getLogger(__name__)
 
 # ==========================================
 # ACCESS CONTROL DECORATORS
@@ -54,6 +58,45 @@ def role_required(allowed_roles):
 admin_required = role_required(['admin'])
 doctor_required = role_required(['doctor'])
 patient_required = role_required(['patient'])
+
+
+def is_admin_user(user):
+    return user.is_authenticated and (user.is_superuser or user.role == 'admin')
+
+
+def get_doctor_profile_for_user(user):
+    return getattr(user, 'doctor_profile', None)
+
+
+def get_patient_profile_for_user(user):
+    return getattr(user, 'patient_profile', None)
+
+
+def require_doctor_ownership(request, appointment):
+    doctor_profile = get_doctor_profile_for_user(request.user)
+    logger.debug(
+        "Appointment access check user=%s doctor_profile=%s appointment_id=%s appointment_doctor_user=%s",
+        request.user.pk,
+        getattr(doctor_profile, 'pk', None),
+        appointment.pk,
+        getattr(getattr(appointment.doctor, 'user', None), 'pk', None),
+    )
+    if not doctor_profile or appointment.doctor_id != doctor_profile.id:
+        raise PermissionDenied("You do not have permission to access this appointment.")
+    return doctor_profile
+
+
+def require_patient_assigned_to_doctor(request, patient_profile):
+    doctor_profile = get_doctor_profile_for_user(request.user)
+    logger.debug(
+        "Patient access check user=%s doctor_profile=%s patient_id=%s",
+        request.user.pk,
+        getattr(doctor_profile, 'pk', None),
+        patient_profile.pk,
+    )
+    if not doctor_profile or not Appointment.objects.filter(patient=patient_profile, doctor=doctor_profile).exists():
+        raise PermissionDenied("You do not have permission to access this patient record.")
+    return doctor_profile
 
 # ==========================================
 # PUBLIC VIEWS & AUTHENTICATION
@@ -259,7 +302,15 @@ def doctor_dashboard(request):
     """
     Dashboard for doctors showing their assigned appointments.
     """
-    doctor_profile = request.user.doctor_profile
+    doctor_profile = get_doctor_profile_for_user(request.user)
+    if doctor_profile is None:
+        messages.error(request, "Doctor profile not found.")
+        return redirect('dashboard_redirect')
+    logger.debug(
+        "Doctor dashboard user=%s doctor_profile=%s",
+        request.user.pk,
+        doctor_profile.pk,
+    )
     appointments_qs = Appointment.objects.filter(doctor=doctor_profile)
     total_assigned = appointments_qs.count()
     pending = appointments_qs.filter(status='Pending').count()
@@ -275,13 +326,27 @@ def doctor_dashboard(request):
     }
     return render(request, 'appointments/doctor_dashboard.html', context)
 
-@doctor_required
-def doctor_update_status(request, appointment_id):
-    """
-    Allows a doctor to update the status of their assigned appointments.
-    """
-    doctor_profile = request.user.doctor_profile
-    appointment = get_object_or_404(Appointment, id=appointment_id, doctor=doctor_profile)
+def _update_appointment_status(request, appointment_id, redirect_target, require_admin=False):
+    if require_admin:
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+    else:
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+
+    logger.debug(
+        "Appointment status flow user=%s appointment_id=%s appointment_doctor=%s redirect_target=%s require_admin=%s",
+        request.user.pk,
+        appointment.pk,
+        appointment.doctor_id,
+        redirect_target,
+        require_admin,
+    )
+
+    if require_admin:
+        if not is_admin_user(request.user):
+            raise PermissionDenied("Admin access required.")
+    else:
+        require_doctor_ownership(request, appointment)
+
     if request.method == 'POST':
         new_status = request.POST.get('status')
         if new_status in ['Pending', 'Approved', 'Completed', 'Cancelled']:
@@ -290,34 +355,92 @@ def doctor_update_status(request, appointment_id):
             messages.success(request, f"Appointment status updated to '{new_status}' successfully.")
         else:
             messages.error(request, "Invalid status choice.")
-    return redirect('doctor_dashboard')
+    return redirect(redirect_target)
+
+
+@doctor_required
+def doctor_update_status(request, appointment_id):
+    """
+    Allows a doctor to update only their own appointments.
+    """
+    return _update_appointment_status(request, appointment_id, 'doctor_dashboard', require_admin=False)
+
+
+@admin_required
+def admin_update_appointment_status(request, appointment_id):
+    """Allows an admin to update any appointment status."""
+    return _update_appointment_status(request, appointment_id, 'admin_dashboard', require_admin=True)
 
 @doctor_required
 def doctor_view_patient(request, patient_id):
     """
-    Allows a doctor to view patient profile information.
+    Allows a doctor to view patient profile information only for their own appointments.
+    Admins can view any patient record.
     """
-    patient_profile = get_object_or_404(PatientProfile, id=patient_id)
+    doctor_profile = get_doctor_profile_for_user(request.user)
+    if doctor_profile is None:
+        messages.error(request, "Doctor profile not found.")
+        return redirect('dashboard_redirect')
+    patient_profile = get_object_or_404(PatientProfile.objects.select_related('user'), id=patient_id)
+    require_patient_assigned_to_doctor(request, patient_profile)
+    logger.debug(
+        "Doctor patient view user=%s doctor_profile=%s patient_id=%s",
+        request.user.pk,
+        doctor_profile.pk,
+        patient_profile.pk,
+    )
     return render(request, 'appointments/patient_details_modal.html', {'patient': patient_profile})
 
 @doctor_required
 def doctor_manage_availability(request):
     """Create, edit, and list availability slots for the logged-in doctor."""
-    doctor_profile = request.user.doctor_profile
+    doctor_profile = get_doctor_profile_for_user(request.user)
+    if doctor_profile is None:
+        messages.error(request, "Doctor profile not found.")
+        return redirect('dashboard_redirect')
+    editing_slot = None
+    edit_id = request.POST.get('slot_id') if request.method == 'POST' else request.GET.get('edit')
+
+    if edit_id:
+        editing_slot = get_object_or_404(DoctorAvailability, id=edit_id, doctor=doctor_profile)
+
     if request.method == 'POST':
-        form = DoctorAvailabilityForm(request.POST)
+        form = DoctorAvailabilityForm(request.POST, instance=editing_slot)
         if form.is_valid():
             availability = form.save(commit=False)
             availability.doctor = doctor_profile
             availability.save()
-            messages.success(request, "Availability slot added.")
+            if editing_slot:
+                messages.success(request, "Availability slot updated.")
+            else:
+                messages.success(request, "Availability slot added.")
             return redirect('doctor_manage_availability')
         else:
             messages.error(request, "Please correct the errors below.")
     else:
-        form = DoctorAvailabilityForm()
+        form = DoctorAvailabilityForm(instance=editing_slot)
     availabilities = DoctorAvailability.objects.filter(doctor=doctor_profile)
-    return render(request, 'appointments/doctor_availability.html', {'form': form, 'availabilities': availabilities})
+    return render(request, 'appointments/doctor_availability.html', {
+        'form': form,
+        'availabilities': availabilities,
+        'editing_slot': editing_slot,
+    })
+
+@doctor_required
+def doctor_delete_availability(request, slot_id):
+    """Delete one availability slot owned by the logged-in doctor."""
+    if request.method != 'POST':
+        messages.error(request, "Invalid request method.")
+        return redirect('doctor_manage_availability')
+
+    doctor_profile = get_doctor_profile_for_user(request.user)
+    if doctor_profile is None:
+        messages.error(request, "Doctor profile not found.")
+        return redirect('dashboard_redirect')
+    slot = get_object_or_404(DoctorAvailability, id=slot_id, doctor=doctor_profile)
+    slot.delete()
+    messages.success(request, "Availability slot deleted.")
+    return redirect('doctor_manage_availability')
 
 # ==========================================
 # PATIENT VIEWS
@@ -328,7 +451,10 @@ def patient_dashboard(request):
     """
     Dashboard for patients to view summary statistics and recent activity.
     """
-    patient_profile = request.user.patient_profile
+    patient_profile = get_patient_profile_for_user(request.user)
+    if patient_profile is None:
+        messages.error(request, "Patient profile not found.")
+        return redirect('dashboard_redirect')
     appointments_qs = Appointment.objects.filter(patient=patient_profile)
     total_booked = appointments_qs.count()
     pending = appointments_qs.filter(status='Pending').count()
@@ -357,7 +483,10 @@ def book_appointment(request, doctor_id=None):
     """
     Enables patient to book an appointment with a doctor.
     """
-    patient_profile = request.user.patient_profile
+    patient_profile = get_patient_profile_for_user(request.user)
+    if patient_profile is None:
+        messages.error(request, "Patient profile not found.")
+        return redirect('dashboard_redirect')
     if request.method == 'POST':
         form = AppointmentForm(request.POST)
         if form.is_valid():
@@ -381,7 +510,10 @@ def appointment_history(request):
     """
     Lists history of all appointments booked by the patient.
     """
-    patient_profile = request.user.patient_profile
+    patient_profile = get_patient_profile_for_user(request.user)
+    if patient_profile is None:
+        messages.error(request, "Patient profile not found.")
+        return redirect('dashboard_redirect')
     appointments = Appointment.objects.filter(patient=patient_profile).select_related('doctor__user').order_by('-scheduled_datetime')
     return render(request, 'appointments/appointment_history.html', {'appointments': appointments})
 
@@ -390,7 +522,10 @@ def cancel_appointment(request, appointment_id):
     """
     Allows a patient to cancel an appointment if it is Pending or Approved.
     """
-    patient_profile = request.user.patient_profile
+    patient_profile = get_patient_profile_for_user(request.user)
+    if patient_profile is None:
+        messages.error(request, "Patient profile not found.")
+        return redirect('dashboard_redirect')
     appointment = get_object_or_404(Appointment, id=appointment_id, patient=patient_profile)
     if appointment.status in ['Pending', 'Approved']:
         appointment.status = 'Cancelled'
@@ -414,6 +549,9 @@ def hospital_detail(request, hospital_id):
     return render(request, 'appointments/hospital_detail.html', {'hospital': hospital, 'doctors': doctors})
 
 def doctor_discovery(request):
+    # Prevent doctors from accessing the public discovery page; redirect them to their dashboard
+    if request.user.is_authenticated and getattr(request.user, 'role', None) == 'doctor':
+        return redirect('doctor_dashboard')
     department_id = request.GET.get('department')
     hospitals = Hospital.objects.filter(doctors__isnull=False).distinct()
     departments = Department.objects.all()
@@ -637,4 +775,3 @@ def admin_delete_hospital(request, hospital_id):
     hospital.delete()
     messages.success(request, f"Hospital '{hospital_name}' has been successfully deleted.")
     return redirect('admin_hospital_list')
-

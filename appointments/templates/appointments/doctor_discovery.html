@@ -5,8 +5,8 @@
 
 {% block content %}
 <!-- Premium Banner -->
-<div class="hero-gradient mb-5">
-    <div class="container py-4 text-center text-md-start">
+<div class="hero-gradient doctor-discovery-hero mb-5">
+    <div class="container text-center text-md-start">
         <div class="row align-items-center">
             <div class="col-md-8">
                 <span class="badge bg-white bg-opacity-20 px-3 py-2 rounded-pill mb-3 text-uppercase fw-semibold tracking-wider text-white">Find Specialists</span>
@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<div class="container my-5">
+<div class="container my-5 doctor-discovery-page">
     <div class="row g-4">
         <!-- Sidebar filters -->
         <div class="col-lg-3 col-md-4">
@@ -100,48 +100,51 @@
                              data-hosp-id="{{ doc.hospital.id }}"
                              data-fees="{{ doc.consultation_fees }}">
                             
-                            <div class="card glass-card h-100 border-0 shadow-sm hover-lift overflow-hidden">
+                            <div class="card glass-card doctor-card h-100 border-0 shadow-sm overflow-hidden">
                                 <!-- Top Background Accents -->
                                 <div class="w-100" style="height: 8px; background: var(--teal-blue-gradient);"></div>
                                 
-                                <div class="card-body p-4 d-flex flex-column text-center">
+                                <div class="card-body d-flex flex-column text-center">
                                     <!-- Avatar -->
-                                    <div class="mb-3 position-relative d-inline-block mx-auto">
-                                        {% if doc.profile_image %}
-                                            <img src="{{ doc.profile_image.url }}" alt="Dr. {{ doc.user.first_name }}" class="doctor-avatar-large">
-                                        {% else %}
-                                            <div class="doctor-avatar-large mx-auto bg-teal bg-opacity-10 text-teal d-flex align-items-center justify-content-center fs-2 fw-bold">
-                                                {{ doc.user.first_name|slice:":1" }}{{ doc.user.last_name|slice:":1" }}
-                                            </div>
-                                        {% endif %}
-                                        
-                                        <!-- Availability status badge -->
-                                        <span class="position-absolute bottom-0 end-0 translate-middle-y badge rounded-circle p-2 bg-success border border-white shadow" title="Available">
-                                            <span class="visually-hidden">Available</span>
-                                        </span>
+                                    <div class="doctor-avatar-wrap">
+                                        <div class="doctor-avatar-frame position-relative">
+                                            {% if doc.profile_image %}
+                                                <img src="{{ doc.profile_image.url }}" alt="Dr. {{ doc.user.first_name }}" class="doctor-avatar-large">
+                                            {% else %}
+                                                <div class="doctor-avatar-large bg-teal bg-opacity-10 text-teal d-flex align-items-center justify-content-center fs-2 fw-bold">
+                                                    {{ doc.user.first_name|slice:":1" }}{{ doc.user.last_name|slice:":1" }}
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <!-- Availability status badge -->
+                                            <span class="position-absolute bottom-0 end-0 translate-middle-y badge rounded-circle p-2 bg-success border border-white shadow" title="Available">
+                                                <span class="visually-hidden">Available</span>
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    <h5 class="fw-bold mb-1 text-dark">Dr. {{ doc.user.first_name }} {{ doc.user.last_name }}</h5>
-                                    <p class="badge bg-teal bg-opacity-10 text-teal rounded-pill px-3 py-1.5 fs-7 mb-3 border-0">{{ doc.specialization }}</p>
+                                    <div class="doctor-name">
+                                        <h5 class="mb-0 text-dark">Dr. {{ doc.user.first_name }} {{ doc.user.last_name }}</h5>
+                                    </div>
                                     
-                                    <div class="text-secondary small mb-4 flex-grow-1">
-                                        <div class="d-flex align-items-center justify-content-center gap-1.5 mb-1.5">
-                                            <i class="fa-solid fa-hospital text-muted"></i>
-                                            <span>{{ doc.hospital.hospital_name }}</span>
+                                    <div class="doctor-meta flex-grow-1">
+                                        <div class="meta-item">
+                                            <span class="meta-icon"><i class="fa-solid fa-hospital"></i></span>
+                                            <span class="meta-text">{{ doc.hospital.hospital_name }}</span>
                                         </div>
-                                        <div class="d-flex align-items-center justify-content-center gap-1.5 mb-1.5">
-                                            <i class="fa-solid fa-briefcase text-muted"></i>
-                                            <span>{{ doc.experience }} Years Experience</span>
+                                        <div class="meta-item">
+                                            <span class="meta-icon"><i class="fa-solid fa-briefcase"></i></span>
+                                            <span class="meta-text">{{ doc.experience }} Years Experience</span>
                                         </div>
-                                        <div class="d-flex align-items-center justify-content-center gap-1.5">
-                                            <i class="fa-solid fa-circle-dollar-to-slot text-muted"></i>
-                                            <span>Consultation Fee: <strong class="text-teal">${{ doc.consultation_fees }}</strong></span>
+                                        <div class="meta-item">
+                                            <span class="meta-icon"><i class="fa-solid fa-circle-dollar-to-slot"></i></span>
+                                            <span class="meta-text">Consultation Fee: <strong class="text-teal">${{ doc.consultation_fees }}</strong></span>
                                         </div>
                                     </div>
 
-                                    <div class="mt-auto pt-3 border-top">
+                                    <div class="doctor-card-action mt-auto pt-3 border-top">
                                         {% if request.user.role == 'patient' %}
-                                            <a href="{% url 'book_appointment_with_doctor' doc.id %}" class="btn btn-primary-custom w-100 py-2 d-flex align-items-center justify-content-center gap-1.5">
+                                            <a href="{% url 'book_appointment_with_doctor' doc.id %}" class="btn btn-primary-custom w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                                                 <i class="fa-regular fa-calendar-check"></i>
                                                 <span>Book Appointment</span>
                                             </a>
@@ -191,10 +194,11 @@
         const filterLoader = document.getElementById('filter-loader');
         const doctorsContainer = document.getElementById('doctors-container');
 
-        // Initial department select from URL param
-        {% if selected_department %}
-        filterRoster();
-        {% endif %}
+        const shouldFilterInitially = '{{ selected_department|yesno:"true,false" }}' === 'true';
+
+        if (shouldFilterInitially) {
+            filterRoster();
+        }
 
         nameSearch.addEventListener('input', debounce(filterRoster, 200));
         departmentFilter.addEventListener('change', filterRoster);

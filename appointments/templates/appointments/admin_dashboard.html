@@ -275,20 +275,31 @@
                                             <span class="badge-status badge-{{ appointment.status|lower }}">{{ appointment.status }}</span>
                                         </td>
                                         <td class="text-end">
-                                            <button
-                                                type="button"
-                                                class="btn btn-outline-danger btn-sm px-3 js-delete-appointment"
-                                                title="Delete Appointment Record"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deleteAppointmentModal"
-                                                data-delete-url="{% url 'admin_delete_appointment' appointment.id %}"
-                                                data-patient-name="{{ appointment.patient.user.first_name }} {{ appointment.patient.user.last_name }}"
-                                                data-doctor-name="Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}"
-                                                data-date="{{ appointment.scheduled_datetime|date:'Y-m-d' }}"
-                                                data-time="{{ appointment.scheduled_datetime|time:'g:i A' }}"
+                                            <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
+                                                <form method="POST" action="{% url 'admin_update_appointment_status' appointment.id %}" class="d-inline-block">
+                                                    {% csrf_token %}
+                                                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="min-width: 120px;">
+                                                        <option value="Pending" {% if appointment.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                                        <option value="Approved" {% if appointment.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                                        <option value="Completed" {% if appointment.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                                        <option value="Cancelled" {% if appointment.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                                    </select>
+                                                </form>
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-outline-danger btn-sm px-3 js-delete-appointment"
+                                                    title="Delete Appointment Record"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteAppointmentModal"
+                                                    data-delete-url="{% url 'admin_delete_appointment' appointment.id %}"
+                                                    data-patient-name="{{ appointment.patient.user.first_name }} {{ appointment.patient.user.last_name }}"
+                                                    data-doctor-name="Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}"
+                                                    data-date="{{ appointment.scheduled_datetime|date:'Y-m-d' }}"
+                                                    data-time="{{ appointment.scheduled_datetime|time:'g:i A' }}"
                                             >
-                                                <i class="fa-solid fa-trash-can"></i> Delete
-                                            </button>
+                                                    <i class="fa-solid fa-trash-can"></i> Delete
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}
